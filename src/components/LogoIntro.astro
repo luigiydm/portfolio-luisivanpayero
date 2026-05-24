@@ -1,0 +1,331 @@
+---
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+---
+
+<section
+  id="logo-intro"
+  class="logo-intro"
+  aria-label={isEs ? "Animacion del logo" : "Logo animation"}
+  hidden
+>
+  <div class="logo-intro__glow" aria-hidden="true"></div>
+  <div class="logo-intro__mark" aria-hidden="true">
+    <img class="logo-intro__layer logo-intro__nube" src="/logo-animation/nube_color.svg" alt="" />
+    <img class="logo-intro__layer logo-intro__simbolo" src="/logo-animation/simbolo_color.svg" alt="" />
+    <img class="logo-intro__layer logo-intro__texto" src="/logo-animation/texto_color.svg" alt="" />
+    <img class="logo-intro__layer logo-intro__bigote" src="/logo-animation/bigote_black.svg" alt="" />
+  </div>
+  <button class="logo-intro__skip" type="button">{isEs ? "Saltar" : "Skip"}</button>
+</section>
+
+<script is:inline>
+  (() => {
+    const intro = document.getElementById("logo-intro")
+    if (!intro || intro.dataset.bound === "true") return
+    intro.dataset.bound = "true"
+
+    const storageKey = "logo-intro-seen"
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    const hasSeenIntro = () => {
+      try {
+        return sessionStorage.getItem(storageKey) === "true"
+      } catch {
+        return false
+      }
+    }
+
+    const markIntroAsSeen = () => {
+      try {
+        sessionStorage.setItem(storageKey, "true")
+      } catch {}
+    }
+
+    if (prefersReducedMotion || hasSeenIntro()) {
+      intro.remove()
+      return
+    }
+
+    const finishIntro = () => {
+      if (intro.dataset.done === "true") return
+
+      intro.dataset.done = "true"
+      markIntroAsSeen()
+      intro.classList.add("logo-intro--leaving")
+      document.documentElement.classList.remove("logo-intro-active")
+      document.removeEventListener("keydown", handleKeyDown)
+      window.setTimeout(() => intro.remove(), 420)
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        window.clearTimeout(fallbackTimer)
+        finishIntro()
+      }
+    }
+
+    intro.hidden = false
+    document.documentElement.classList.add("logo-intro-active")
+
+    const fallbackTimer = window.setTimeout(finishIntro, 2400)
+    const dismiss = () => {
+      window.clearTimeout(fallbackTimer)
+      finishIntro()
+    }
+    intro.addEventListener("click", dismiss)
+    intro.addEventListener("pointerdown", dismiss, { once: true })
+
+    document.addEventListener("keydown", handleKeyDown)
+  })()
+</script>
+
+<style>
+  .logo-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.78) 42%, rgba(224, 242, 254, 0.45) 66%, rgba(248, 250, 252, 0.96)),
+      linear-gradient(135deg, #f8fafc, #e0f2fe 48%, #f8fafc);
+    animation: logo-intro-panel 2.2s cubic-bezier(0.33, 0, 0.12, 1) both;
+  }
+
+  :global(.dark) .logo-intro {
+    background:
+      radial-gradient(circle at 50% 44%, rgba(125, 220, 255, 0.13), transparent 36%),
+      radial-gradient(circle at 50% 44%, rgba(248, 250, 252, 0.08), transparent 19%),
+      #020617;
+  }
+
+  :global(html.logo-intro-active) {
+    overflow: hidden;
+  }
+
+  .logo-intro--leaving {
+    pointer-events: none;
+    animation: logo-intro-leave 0.42s cubic-bezier(0.33, 0, 0.12, 1) forwards;
+  }
+
+  .logo-intro__glow {
+    position: absolute;
+    width: min(92vmin, 760px);
+    aspect-ratio: 1;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.2), transparent 62%);
+    filter: blur(18px);
+    animation: logo-intro-glow 2.2s ease both;
+  }
+
+  :global(.dark) .logo-intro__glow {
+    background: radial-gradient(circle, rgba(125, 220, 255, 0.14), transparent 58%);
+    filter: blur(26px);
+  }
+
+  .logo-intro__mark {
+    position: relative;
+    width: min(78vmin, 560px);
+    aspect-ratio: 1;
+    isolation: isolate;
+    transform-origin: center;
+    animation: logo-intro-hold 2.2s linear both;
+  }
+
+  .logo-intro__layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    transform-origin: center;
+  }
+
+  .logo-intro__nube,
+  .logo-intro__simbolo {
+    opacity: 0;
+    animation: logo-intro-cloud 2.2s cubic-bezier(0.2, 1.45, 0.34, 1) both;
+  }
+
+  .logo-intro__texto {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    animation: logo-intro-text 2.2s cubic-bezier(0.33, 0, 0.12, 1) both;
+  }
+
+  .logo-intro__bigote {
+    opacity: 0;
+    filter: drop-shadow(0 12px 22px rgba(15, 23, 42, 0.12));
+    animation: logo-intro-moustache 2.2s cubic-bezier(0.2, 1.45, 0.34, 1) both;
+  }
+
+  :global(.dark) .logo-intro__bigote {
+    filter: invert(1) drop-shadow(0 12px 24px rgba(125, 220, 255, 0.16));
+  }
+
+  .logo-intro__skip {
+    position: absolute;
+    right: clamp(18px, 4vw, 42px);
+    bottom: clamp(18px, 4vw, 42px);
+    border: 1px solid rgba(15, 23, 42, 0.14);
+    border-radius: 999px;
+    padding: 0.55rem 0.9rem;
+    color: rgba(15, 23, 42, 0.72);
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(14px);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .logo-intro__skip:hover {
+    color: rgb(3, 105, 161);
+    border-color: rgba(14, 165, 233, 0.36);
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  :global(.dark) .logo-intro__skip {
+    color: rgba(226, 232, 240, 0.72);
+    border-color: rgba(125, 220, 255, 0.18);
+    background: rgba(2, 6, 23, 0.52);
+  }
+
+  :global(.dark) .logo-intro__skip:hover {
+    color: rgb(125, 220, 255);
+    border-color: rgba(125, 220, 255, 0.36);
+    background: rgba(15, 23, 42, 0.78);
+  }
+
+  @keyframes logo-intro-cloud {
+    0% {
+      opacity: 0;
+      transform: translateY(-18%) scale(0.72);
+    }
+
+    9% {
+      opacity: 1;
+    }
+
+    18% {
+      opacity: 1;
+      transform: translateY(2.4%) scale(1.12);
+    }
+
+    27% {
+      opacity: 1;
+      transform: translateY(-0.8%) scale(0.96);
+    }
+
+    35%, 100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes logo-intro-text {
+    0%, 26% {
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+      transform: translateY(2.2%) scale(0.97);
+    }
+
+    36% {
+      opacity: 1;
+    }
+
+    56%, 100% {
+      opacity: 1;
+      clip-path: inset(0 0 0 0);
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes logo-intro-moustache {
+    0%, 54% {
+      opacity: 0;
+      transform: translateY(3%) rotate(-4deg) scale(0.35);
+    }
+
+    63% {
+      opacity: 1;
+      transform: translateY(-1%) rotate(2deg) scale(1.18);
+    }
+
+    70% {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg) scale(0.96);
+    }
+
+    78%, 100% {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg) scale(1);
+    }
+  }
+
+  @keyframes logo-intro-hold {
+    0%, 82% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateY(1.2%) scale(0.94);
+    }
+  }
+
+  @keyframes logo-intro-panel {
+    0%, 84% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes logo-intro-leave {
+    to {
+      opacity: 0;
+      transform: scale(1.015);
+    }
+  }
+
+  @keyframes logo-intro-glow {
+    0% {
+      opacity: 0;
+      transform: scale(0.72);
+    }
+
+    26% {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(1.16);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .logo-intro__mark {
+      width: min(88vmin, 460px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-intro {
+      display: none;
+    }
+  }
+</style>

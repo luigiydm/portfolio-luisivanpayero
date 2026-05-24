@@ -1,0 +1,205 @@
+---
+import BrandMark from "@/components/BrandMark.astro"
+import Badge from "@/components/Badge.astro"
+import LinkedInIcon from "@/components/icons/LinkedIn.astro"
+import MailIcon from "@/components/icons/Mail.astro"
+
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+const caseHref = isEs ? "/es/#case-studies" : "/#case-studies"
+const contactHref = isEs
+  ? "mailto:luisivanpayero@gmail.com?subject=Revisemos%20mi%20caso%20de%20data%20platform"
+  : "mailto:luisivanpayero@gmail.com?subject=Let's%20review%20my%20data%20platform%20case"
+const t = isEs
+  ? {
+      badge: "Cuando el problema no es el dashboard",
+      kicker: "Troubleshooting · Data Platforms · Reporting Reliability · AWS",
+      title: "Reporting confiable empieza antes de Power BI.",
+      subtitle:
+        "Ayudo a equipos a investigar por qué sus sistemas de reporting dejan de ser confiables: datos dispersos, procesos manuales, pipelines frágiles, ownership difuso o costos cloud que crecen sin explicación.",
+      contact: "Contame qué está fallando",
+      read: "Ver casos reales",
+      linkedIn: "Hablar por LinkedIn",
+      chips: ["Datos confiables", "Pipelines estables", "Reporting que escala", "Costos visibles"],
+      approach: "Entro al barro del dato",
+      cardTitle: "El problema visible rara vez es el problema real.",
+      cardBody:
+        "Vengo de soporte, redes y aplicaciones productivas. Eso me ayuda a investigar sistemas vivos: no miro solo el reporte, miro fuentes, procesos, infraestructura, costos, ownership y cómo opera el equipo.",
+      signalsTitle: "Cuándo puedo ayudarte",
+      signals: [
+        "El reporte falla, tarda demasiado o nadie confía del todo en los números.",
+        "El proceso depende de Excel, pasos manuales o conocimiento que vive en una sola persona.",
+        "Hay costos, errores o cuellos de botella que aparecen pero nadie termina de explicar.",
+      ],
+      mapLabel: "Mapa de investigación",
+      mapFooter: "El objetivo no es culpar a la herramienta visible. Es encontrar dónde se rompe el flujo.",
+      mapNodes: [
+        { title: "Fuentes", body: "Bases, APIs, archivos" },
+        { title: "Procesos", body: "Cargas, reglas, validaciones" },
+        { title: "Modelo", body: "Métricas y capa analítica" },
+        { title: "Reporte", body: "Power BI, KPIs, consumo" },
+      ],
+      outcomeTitle: "Resultado buscado",
+      outcome: "Pasar de apagar incendios de datos a tener procesos claros, mantenibles y confiables.",
+    }
+  : {
+      badge: "When the dashboard is not the real problem",
+      kicker: "Troubleshooting · Data Platforms · Reporting Reliability · AWS",
+      title: "Reliable reporting starts before Power BI.",
+      subtitle:
+        "I help teams investigate why reporting systems stop being reliable: scattered data, manual processes, fragile pipelines, unclear ownership or cloud costs growing without explanation.",
+      contact: "Tell me what's failing",
+      read: "See real cases",
+      linkedIn: "Talk on LinkedIn",
+      chips: ["Trustworthy data", "Stable pipelines", "Reporting that scales", "Visible costs"],
+      approach: "I get into the data mess",
+      cardTitle: "The visible problem is rarely the real problem.",
+      cardBody:
+        "I come from support, networking and production applications. That helps me investigate live systems: I do not only look at the report, I look at sources, processes, infrastructure, costs, ownership and how the team operates.",
+      signalsTitle: "When I can help",
+      signals: [
+        "The report fails, takes too long or people do not fully trust the numbers.",
+        "The process depends on Excel, manual steps or knowledge that lives with one person.",
+        "Costs, errors or bottlenecks appear but nobody can fully explain them.",
+      ],
+      mapLabel: "Investigation map",
+      mapFooter: "The goal is not to blame the visible tool. It is to find where the flow breaks.",
+      mapNodes: [
+        { title: "Sources", body: "Databases, APIs, files" },
+        { title: "Processes", body: "Loads, rules, checks" },
+        { title: "Model", body: "Metrics and analytics layer" },
+        { title: "Report", body: "Power BI, KPIs, usage" },
+      ],
+      outcomeTitle: "Target outcome",
+      outcome: "Move from firefighting data issues to clear, maintainable and trustworthy processes.",
+    }
+---
+<div class="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] xl:gap-16">
+  <div>
+    <div class="hero-reveal flex flex-wrap items-center gap-4 mb-7" style="--hero-delay: 80ms">
+      <div class="flex items-center justify-center size-16 rounded-2xl border border-slate-200/80 bg-white/70 shadow-xl shadow-slate-950/5 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:shadow-black/30">
+        <BrandMark class="size-12" />
+      </div>
+      <a
+        href="https://www.linkedin.com/in/luis-ivan-payero-324873136/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="flex items-center transition md:justify-center md:hover:scale-105"
+      >
+        <Badge>{t.badge}</Badge>
+      </a>
+    </div>
+
+    <p class="hero-reveal mb-5 text-sm font-semibold tracking-[0.26em] text-[#0074A8] uppercase dark:text-sky-300" style="--hero-delay: 160ms">
+      {t.kicker}
+    </p>
+
+    <h1 class="hero-reveal max-w-4xl text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-7xl dark:text-white" style="--hero-delay: 230ms">
+      {t.title}
+    </h1>
+
+    <p class="hero-reveal max-w-2xl mt-6 text-lg leading-8 text-slate-700 sm:text-xl dark:text-slate-300" style="--hero-delay: 300ms">
+      {t.subtitle}
+    </p>
+
+    <div class="hero-reveal flex flex-wrap gap-2.5 mt-7 text-sm text-slate-600 dark:text-zinc-300" style="--hero-delay: 370ms">
+      {t.chips.map((chip) => (
+        <span class="rounded-full border border-slate-200/80 bg-white/60 px-3 py-1 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">{chip}</span>
+      ))}
+    </div>
+
+    <nav aria-label={isEs ? "Acciones del hero" : "Hero actions"} class="hero-reveal flex flex-wrap gap-3 mt-8" style="--hero-delay: 440ms">
+      <a href={contactHref} class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-slate-950/10 transition hover:-translate-y-0.5 hover:bg-[#004F8B] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:bg-white dark:text-slate-950 dark:hover:bg-sky-200 dark:focus-visible:ring-offset-slate-950">
+        <MailIcon class="size-4" />
+        {t.contact}
+      </a>
+      <a href={caseHref} class="inline-flex items-center justify-center rounded-full border border-slate-200/80 bg-white/70 px-5 py-3 text-sm font-semibold text-slate-800 backdrop-blur transition hover:-translate-y-0.5 hover:border-[#004F8B] hover:text-[#004F8B] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:border-sky-300 dark:hover:text-sky-200 dark:focus-visible:ring-offset-slate-950">
+        {t.read}
+      </a>
+      <a href="https://www.linkedin.com/in/luis-ivan-payero-324873136/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-full border border-transparent px-5 py-3 text-sm font-semibold text-slate-600 transition hover:text-[#004F8B] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:text-slate-300 dark:hover:text-sky-200 dark:focus-visible:ring-offset-slate-950">
+        <LinkedInIcon class="size-4" />
+        {t.linkedIn}
+      </a>
+    </nav>
+  </div>
+
+  <div class="hero-reveal relative" style="--hero-delay: 520ms">
+    <div class="absolute -inset-6 rounded-[2rem] bg-sky-300/10 blur-3xl dark:bg-sky-500/10"></div>
+    <div class="hero-card relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/70 p-6 shadow-2xl shadow-slate-950/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-black/40 md:p-7">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">
+          {t.approach}
+        </p>
+        <h2 class="mt-3 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white md:text-3xl">
+          {t.cardTitle}
+        </h2>
+      </div>
+
+      <p class="mt-4 text-base leading-7 text-slate-600 dark:text-slate-300">
+        {t.cardBody}
+      </p>
+
+      <div class="mt-7 rounded-[1.5rem] border border-slate-200/80 bg-slate-950 p-4 text-white dark:border-white/10 dark:bg-black/25">
+        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-200">{t.mapLabel}</p>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+          {t.mapNodes.map((node, index) => (
+            <div class="relative rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <span class="text-xs font-semibold text-sky-200">0{index + 1}</span>
+              <h3 class="mt-2 font-semibold text-white">{node.title}</h3>
+              <p class="mt-1 text-sm leading-5 text-zinc-400">{node.body}</p>
+            </div>
+          ))}
+        </div>
+        <p class="mt-4 text-sm leading-6 text-zinc-300">{t.mapFooter}</p>
+      </div>
+
+      <div class="mt-5 rounded-[1.5rem] border border-slate-200/80 bg-white/60 p-5 dark:border-white/10 dark:bg-white/[0.03]">
+        <p class="text-sm font-semibold text-slate-950 dark:text-white">{t.signalsTitle}</p>
+        <ul class="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+          {t.signals.map((signal) => (
+            <li class="flex gap-3">
+              <span class="mt-2 size-2 shrink-0 rounded-full bg-[#00AEEF]"></span>
+              <span>{signal}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="mt-5 rounded-[1.5rem] bg-slate-950 p-5 text-white dark:bg-white dark:text-slate-950">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-sky-200 dark:text-[#004F8B]">{t.outcomeTitle}</p>
+        <p class="mt-3 text-lg font-semibold leading-7">{t.outcome}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-reveal {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+      animation: hero-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation-delay: var(--hero-delay, 0ms);
+      will-change: opacity, transform;
+    }
+
+    .hero-card {
+      transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 320ms ease, border-color 320ms ease;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes hero-reveal {
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+</style>

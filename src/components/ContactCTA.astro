@@ -1,0 +1,59 @@
+---
+import LinkedInIcon from "@/components/icons/LinkedIn.astro"
+import MailIcon from "@/components/icons/Mail.astro"
+
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+const contactHref = isEs
+  ? "mailto:luisivanpayero@gmail.com?subject=Revisemos%20mi%20caso%20de%20datos"
+  : "mailto:luisivanpayero@gmail.com?subject=Let's%20review%20my%20data%20case"
+
+const t = isEs
+  ? {
+      eyebrow: "Siguiente paso",
+      title: "¿Algo está fallando antes de que el dato llegue al reporte?",
+      description:
+        "Mandame qué está pasando: qué reporte tarda, qué proceso se rompe, qué número no cierra o qué costo apareció. Lo vemos con calma y buscamos dónde puede estar el cuello de botella.",
+      primary: "Contame qué está fallando",
+      secondary: "Escribime por LinkedIn",
+      note: "No hace falta un brief formal. Con describir el problema actual alcanza.",
+    }
+  : {
+      eyebrow: "Next step",
+      title: "Is something breaking before data reaches the report?",
+      description:
+        "Send me what is happening: which report is slow, which process breaks, which number does not match or which cost appeared. We can look at it calmly and find where the bottleneck may be.",
+      primary: "Tell me what's failing",
+      secondary: "Message me on LinkedIn",
+      note: "You do not need a formal brief. A clear description of the current problem is enough.",
+    }
+---
+
+<div class="relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-slate-950 p-7 text-white shadow-2xl shadow-slate-950/20 dark:border-white/10 md:p-10">
+  <div class="absolute -right-20 -top-20 size-64 rounded-full bg-[#00AEEF]/20 blur-3xl"></div>
+  <div class="absolute -bottom-24 left-8 size-52 rounded-full bg-[#004F8B]/30 blur-3xl"></div>
+
+  <div class="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-sky-200">{t.eyebrow}</p>
+      <h2 class="mt-4 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">{t.title}</h2>
+      <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300">{t.description}</p>
+      <p class="mt-4 text-sm text-sky-100">{t.note}</p>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row lg:flex-col">
+      <a href={contactHref} class="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+        <MailIcon class="size-4" />
+        {t.primary}
+      </a>
+      <a href="https://www.linkedin.com/in/luis-ivan-payero-324873136/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:border-sky-200 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+        <LinkedInIcon class="size-4" />
+        {t.secondary}
+      </a>
+    </div>
+  </div>
+</div>

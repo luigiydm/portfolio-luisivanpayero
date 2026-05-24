@@ -1,0 +1,96 @@
+---
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+
+const t = isEs
+  ? {
+      eyebrow: "Entrega real",
+      title: "Otros proyectos digitales",
+      intro:
+        "Pequeños trabajos donde el valor fue entregar algo simple, claro y usable. No es el centro del sitio; solo muestra capacidad de llevar una necesidad real a producción.",
+      labels: { problem: "Problema", solution: "Solución", result: "Resultado", live: "Ver sitio" },
+      projects: [
+        {
+          name: "Casa Lucho — pintor profesional",
+          problem: "Un pintor necesitaba presencia online profesional para mostrar trabajos y captar consultas sin sumar costo operativo.",
+          solution: "Arquitectura estática con S3, Cloudflare y Terraform.",
+          result: "Sitio rápido, simple de mantener y con costo prácticamente cero.",
+          href: "https://casa-lucho.com/",
+        },
+        {
+          name: "Diego Rago — pixel artist",
+          problem: "Un pixel artist necesitaba un portfolio que mostrara trabajos y estilo con foco visual.",
+          solution: "Landing liviana con galería ordenada y contacto claro.",
+          result: "Una presencia online enfocada en el trabajo, sin ruido alrededor.",
+          href: "https://diegorago.com/",
+        },
+        {
+          name: "Richard Scobar — estudio de tatuajes",
+          problem: "El estudio necesitaba explicar estilo, trabajos y vías de contacto con claridad.",
+          solution: "Estructura directa, contenido visual y CTA simple.",
+          result: "Menos fricción para consultas reales.",
+          href: "https://richard-scobar-tattoo.netlify.app/",
+        },
+      ],
+    }
+  : {
+      eyebrow: "Real delivery",
+      title: "Other digital projects",
+      intro:
+        "Small projects where the value was shipping something simple, clear and useful. This is not the center of the site; it only shows the ability to turn a real need into production.",
+      labels: { problem: "Problem", solution: "Solution", result: "Result", live: "View live site" },
+      projects: [
+        {
+          name: "Casa Lucho — professional painter",
+          problem: "A painter needed a professional web presence to show work and capture inquiries without adding operational cost.",
+          solution: "Static architecture with S3, Cloudflare and Terraform.",
+          result: "Fast, easy to maintain and practically zero-cost hosting.",
+          href: "https://casa-lucho.com/",
+        },
+        {
+          name: "Diego Rago — pixel artist",
+          problem: "A pixel artist needed a portfolio to showcase work and style with strong visual focus.",
+          solution: "Lightweight landing page with a clean gallery and clear contact.",
+          result: "An online presence focused on the work itself, no noise around it.",
+          href: "https://diegorago.com/",
+        },
+        {
+          name: "Richard Scobar — tattoo studio",
+          problem: "The studio needed to explain style, work and contact clearly.",
+          solution: "Direct structure, visual content and a simple CTA.",
+          result: "Less friction for real inquiries.",
+          href: "https://richard-scobar-tattoo.netlify.app/",
+        },
+      ],
+    }
+---
+
+<div class="rounded-[2rem] border border-slate-200/80 bg-white/60 p-6 backdrop-blur dark:border-white/10 dark:bg-white/[0.025] md:p-8">
+  <div class="max-w-3xl">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">{t.eyebrow}</p>
+    <h2 class="mt-3 text-2xl font-bold tracking-tight text-slate-950 dark:text-white md:text-3xl">{t.title}</h2>
+    <p class="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">{t.intro}</p>
+  </div>
+
+  <div class="mt-7 grid gap-4 lg:grid-cols-3">
+    {
+      t.projects.map((project) => (
+        <article class="rounded-[1.5rem] border border-slate-200/80 bg-white/70 p-5 dark:border-white/10 dark:bg-black/20">
+          <h3 class="text-lg font-semibold text-slate-950 dark:text-white">{project.name}</h3>
+          <div class="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+            <p><strong class="text-slate-950 dark:text-white">{t.labels.problem}:</strong> {project.problem}</p>
+            <p><strong class="text-slate-950 dark:text-white">{t.labels.solution}:</strong> {project.solution}</p>
+            <p><strong class="text-slate-950 dark:text-white">{t.labels.result}:</strong> {project.result}</p>
+          </div>
+          <a href={project.href} target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex text-sm font-semibold text-sky-700 transition hover:text-[#004F8B] dark:text-sky-300 dark:hover:text-sky-200">
+            {t.labels.live} →
+          </a>
+        </article>
+      ))
+    }
+  </div>
+</div>

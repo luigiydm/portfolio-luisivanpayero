@@ -1,0 +1,44 @@
+---
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+
+const t = isEs
+  ? {
+      text: "AWS, PostgreSQL, Python, Airflow y Power BI cuando ayudan a resolver el problema correcto.",
+      note: "No uso herramientas como identidad. Las uso cuando reducen riesgo, aclaran ownership o hacen el sistema más operable.",
+      cases: "Ver casos",
+    }
+  : {
+      text: "AWS, PostgreSQL, Python, Airflow and Power BI when they help solve the right problem.",
+      note: "I do not use tools as identity. I use them when they reduce risk, clarify ownership or make the system more operable.",
+      cases: "See cases",
+    }
+
+const tags = ["AWS", "PostgreSQL", "Python", "Airflow", "Power BI", "SQL", "ETL", "FinOps"]
+const casesHref = isEs ? "/es/#case-studies" : "/#case-studies"
+---
+
+<div class="rounded-[2rem] border border-slate-200/80 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20 md:p-8">
+  <p class="max-w-3xl text-xl font-semibold leading-8 text-slate-950 dark:text-white">{t.text}</p>
+  <p class="mt-4 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">{t.note}</p>
+
+  <ul class="mt-6 flex flex-wrap gap-2">
+    {tags.map((tag) => (
+      <li>
+        <span class="rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-sm font-medium text-[#004F8B] dark:border-white/10 dark:bg-white/[0.04] dark:text-sky-200">
+          {tag}
+        </span>
+      </li>
+    ))}
+  </ul>
+
+  <div class="mt-7 flex flex-wrap gap-3">
+    <a href={casesHref} class="inline-flex rounded-full border border-sky-200 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-800 transition hover:-translate-y-0.5 hover:border-[#004F8B] hover:text-[#004F8B] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:border-sky-400/20 dark:bg-slate-950/60 dark:text-white dark:hover:border-sky-300 dark:hover:text-sky-200 dark:focus-visible:ring-offset-slate-950">
+      {t.cases}
+    </a>
+  </div>
+</div>

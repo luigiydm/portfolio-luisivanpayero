@@ -1,0 +1,113 @@
+---
+import BrandMark from "@/components/BrandMark.astro"
+
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+const CASES_EN = [
+  {
+    number: "01",
+    title: "From Power BI bottlenecks to a warehouse-first architecture",
+    problem: "The visible issue was slow refreshes. The real issue was transformation ownership living inside the BI layer.",
+    approach: "Traced source queries, Power Query transformations and gateway constraints before moving business logic into Python ETL + PostgreSQL models.",
+    result: "Power BI became a consumption layer instead of the place where core analytical logic lived.",
+    tags: ["Warehouse-first", "PostgreSQL", "Power BI", "ETL", "Python"],
+    href: "/case-studies/powerbi-to-warehouse/",
+  },
+  {
+    number: "02",
+    title: "Why a NAT Gateway suddenly processed ~10 TB/day",
+    problem: "A cloud cost spike looked like an application issue, but the root cause was a routing path between Loki and S3.",
+    approach: "Correlated CloudWatch NAT traffic with pod-level Prometheus metrics, isolated Loki and validated the S3 route.",
+    result: "An S3 Gateway Endpoint removed the expensive path and turned the investigation into a reusable FinOps pattern.",
+    tags: ["AWS", "FinOps", "Kubernetes", "Loki", "Networking"],
+    href: "/case-studies/nat-gateway-finops/",
+  },
+  {
+    number: "03",
+    title: "Low-cost static hosting architecture for a real business",
+    problem: "A traditional business needed a professional web presence without adding operational weight or monthly platform cost.",
+    approach: "Used static hosting with S3, Cloudflare and Terraform, keeping the origin restricted and the delivery path simple.",
+    result: "Fast, secure and maintainable hosting with practically zero operating cost.",
+    tags: ["AWS S3", "Cloudflare", "Terraform", "Static Hosting", "Security"],
+    href: "/case-studies/static-hosting-casa-lucho/",
+  },
+]
+
+const CASES_ES = [
+  {
+    number: "01",
+    title: "De cuellos de botella en Power BI a una arquitectura warehouse-first",
+    problem: "El síntoma visible eran refreshs lentos. El problema real era que la lógica de transformación vivía dentro de la capa de BI.",
+    approach: "Seguí consultas origen, transformaciones de Power Query y límites del gateway antes de mover reglas a Python ETL + modelos PostgreSQL.",
+    result: "Power BI pasó a ser una capa de consumo, no el lugar donde vive la lógica analítica principal.",
+    tags: ["Warehouse-first", "PostgreSQL", "Power BI", "ETL", "Python"],
+    href: "/es/case-studies/powerbi-to-warehouse/",
+  },
+  {
+    number: "02",
+    title: "Por qué un NAT Gateway procesó de golpe ~10 TB/día",
+    problem: "Un pico de costo parecía un problema de aplicación, pero la causa raíz era la ruta de red entre Loki y S3.",
+    approach: "Crucé tráfico NAT en CloudWatch con métricas por pod en Prometheus, aislé Loki y validé la ruta hacia S3.",
+    result: "Un S3 Gateway Endpoint eliminó la ruta cara y dejó un patrón FinOps reutilizable.",
+    tags: ["AWS", "FinOps", "Kubernetes", "Loki", "Networking"],
+    href: "/es/case-studies/nat-gateway-finops/",
+  },
+  {
+    number: "03",
+    title: "Arquitectura de hosting estático low-cost para un negocio real",
+    problem: "Un negocio tradicional necesitaba presencia online profesional sin sumar peso operativo ni costo mensual de plataforma.",
+    approach: "Usé hosting estático con S3, Cloudflare y Terraform, manteniendo el origen restringido y una ruta de entrega simple.",
+    result: "Hosting rápido, seguro y mantenible con costo operativo prácticamente cero.",
+    tags: ["AWS S3", "Cloudflare", "Terraform", "Static Hosting", "Seguridad"],
+    href: "/es/case-studies/static-hosting-casa-lucho/",
+  },
+]
+
+const CASES = isEs ? CASES_ES : CASES_EN
+const labels = isEs
+  ? { case: "Investigación", problem: "Síntoma", approach: "Investigación", result: "Resultado", read: "Leer investigación" }
+  : { case: "Investigation", problem: "Symptom", approach: "Investigation", result: "Result", read: "Read investigation" }
+---
+
+<div class="grid gap-5 lg:grid-cols-3">
+  {
+    CASES.map(({ number, title, problem, approach, result, tags, href }) => (
+      <a href={href} class="group relative block overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur transition duration-300 will-change-transform motion-safe:hover:-translate-y-1.5 hover:border-sky-300/70 hover:shadow-2xl hover:shadow-slate-950/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20 dark:focus-visible:ring-offset-slate-950">
+        <div class="absolute -right-12 -top-12 size-40 rounded-full bg-sky-300/10 blur-3xl dark:bg-sky-500/10"></div>
+
+        <div class="relative flex items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">{labels.case} {number}</p>
+            <h3 class="mt-3 text-xl font-bold leading-tight text-slate-950 dark:text-white">{title}</h3>
+          </div>
+          <BrandMark class="size-12 shrink-0 opacity-80 transition duration-300 group-hover:rotate-3 group-hover:scale-105" />
+        </div>
+
+        <div class="relative mt-6 space-y-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
+          <p><strong class="text-slate-950 dark:text-white">{labels.problem}:</strong> {problem}</p>
+          <p><strong class="text-slate-950 dark:text-white">{labels.approach}:</strong> {approach}</p>
+          <p><strong class="text-slate-950 dark:text-white">{labels.result}:</strong> {result}</p>
+        </div>
+
+        <ul class="relative mt-6 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <li>
+              <span class="rounded-full border border-slate-200/80 bg-white/70 px-3 py-1 text-xs font-medium text-[#004F8B] dark:border-white/10 dark:bg-white/[0.04] dark:text-sky-200">
+                {tag}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div class="relative mt-6 rounded-2xl bg-slate-950 px-4 py-3 text-sm text-white dark:bg-white dark:text-slate-950">
+          <span class="font-semibold">{labels.read}</span>
+          <span class="ml-2 inline-block transition group-hover:translate-x-1">→</span>
+        </div>
+      </a>
+    ))
+  }
+</div>

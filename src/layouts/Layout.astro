@@ -1,0 +1,236 @@
+---
+import "@fontsource-variable/onest"
+
+import Header from "../components/Header.astro"
+import Footer from "../components/Footer.astro"
+import LogoIntro from "../components/LogoIntro.astro"
+
+interface Props {
+  title: string
+  description: string
+  lang?: "en" | "es"
+  alternatePath?: string
+}
+
+const { description, title, lang = "en", alternatePath } = Astro.props
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/"
+const shouldShowLogoIntro = pathname === "/" || pathname === "/es"
+
+const siteUrl = Astro.site ?? new URL("https://luisivanpayero.com/")
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString()
+const ogImage = new URL("/porfolio.webp", siteUrl).toString()
+const otherLang = lang === "es" ? "en" : "es"
+const alternateUrl = alternatePath ? new URL(alternatePath, siteUrl).toString() : null
+const ogLocale = lang === "es" ? "es_ES" : "en_US"
+const ogLocaleAlt = lang === "es" ? "en_US" : "es_ES"
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalUrl} />
+    {alternateUrl && <link rel="alternate" hreflang={otherLang} href={alternateUrl} />}
+    <link rel="alternate" hreflang={lang} href={canonicalUrl} />
+    {alternateUrl && <link rel="alternate" hreflang="x-default" href={lang === "en" ? canonicalUrl : alternateUrl} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Luis Iván Payero" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="960" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={ogLocaleAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script is:inline>
+      ;(() => {
+        const getTheme = () => {
+          try {
+            const stored = localStorage.getItem("theme")
+            if (stored === "light" || stored === "dark") return stored
+          } catch {}
+          return "dark"
+        }
+        const applyTheme = (theme, root = document.documentElement) => {
+          const next = theme === "light" ? "light" : "dark"
+          root.classList.toggle("dark", next === "dark")
+          root.dataset.theme = next
+          root.style.colorScheme = next
+        }
+
+        applyTheme(getTheme())
+        window.__applyTheme = (theme) => applyTheme(theme ?? getTheme())
+      })()
+    </script>
+    <title>{title}</title>
+  </head>
+
+  <body class="relative text-slate-950 dark:text-zinc-50">
+    <a href="#main-content" class="skip-link">{lang === "es" ? "Saltar al contenido" : "Skip to content"}</a>
+    <div class="site-bg"></div>
+    {shouldShowLogoIntro && <LogoIntro lang={lang} />}
+    <Header lang={lang} alternatePath={alternatePath} />
+    <div id="main-content"><slot /></div>
+    <Footer lang={lang} />
+    <script is:inline>
+      ;(() => {
+        const initMotionReveal = () => {
+          const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          if (prefersReducedMotion) return
+
+          const sections = Array.from(document.querySelectorAll(".section[id]"))
+          if (!sections.length) return
+
+          document.documentElement.classList.add("motion-ready")
+
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return
+
+                entry.target.classList.add("is-visible")
+                observer.unobserve(entry.target)
+              })
+            },
+            {
+              rootMargin: "0px 0px -8% 0px",
+              threshold: 0.16,
+            }
+          )
+
+          sections.forEach((section, index) => {
+            section.classList.add("motion-reveal")
+            section.style.setProperty("--motion-delay", `${Math.min(index, 2) * 80}ms`)
+            observer.observe(section)
+          })
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initMotionReveal)
+        } else {
+          initMotionReveal()
+        }
+      })()
+    </script>
+    <style is:global>
+      html {
+        font-family: "Onest Variable", system-ui, sans-serif;
+        scroll-behavior: smooth;
+      }
+
+      .skip-link {
+        position: fixed;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 100;
+        padding: 0.55rem 0.95rem;
+        border-radius: 9999px;
+        background: rgb(15, 23, 42);
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 0 10px 30px -12px rgba(2, 6, 23, 0.5);
+        transform: translateY(-200%);
+        transition: transform 180ms ease;
+      }
+
+      .skip-link:focus,
+      .skip-link:focus-visible {
+        transform: translateY(0);
+        outline: 2px solid rgb(125, 220, 255);
+        outline-offset: 2px;
+      }
+
+      ::selection {
+        color: #06111f;
+        background: #7ddcff;
+      }
+
+      body {
+        color: rgba(17, 17, 17, 0.9);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overscroll-behavior: none;
+      }
+
+      .dark body {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .site-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 18% 12%, rgba(0, 174, 239, 0.18), transparent 30rem),
+          radial-gradient(circle at 78% 4%, rgba(15, 23, 42, 0.08), transparent 26rem),
+          linear-gradient(180deg, #f8fafc 0%, #eef2f7 55%, #f8fafc 100%);
+      }
+
+      .site-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 70%);
+        pointer-events: none;
+      }
+
+      .dark .site-bg {
+        background:
+          radial-gradient(circle at 50% -10%, rgba(0, 174, 239, 0.16), transparent 34rem),
+          radial-gradient(circle at 8% 18%, rgba(0, 79, 139, 0.2), transparent 26rem),
+          linear-gradient(180deg, #020617 0%, #050505 42%, #030712 100%);
+      }
+
+      .dark .site-bg::after {
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 72%);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        html.motion-ready .section.motion-reveal {
+          opacity: 0;
+          transform: translate3d(0, 18px, 0);
+          transition:
+            opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+            transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+          transition-delay: var(--motion-delay, 0ms);
+          will-change: opacity, transform;
+        }
+
+        html.motion-ready .section.motion-reveal.is-visible {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+      }
+
+    </style>
+  </body>
+</html>

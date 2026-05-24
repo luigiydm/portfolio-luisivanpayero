@@ -1,0 +1,43 @@
+---
+const personalImageAlt = "Luis Iván Payero"
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+---
+
+<article class="grid items-center gap-10 text-slate-700 dark:text-slate-300 md:grid-cols-[1.35fr_0.65fr]">
+  <div class="order-2 rounded-3xl border border-slate-200/80 bg-white/70 p-6 shadow-xl shadow-slate-950/5 backdrop-blur dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20 md:order-1 [&>p]:mb-4 [&>p>strong]:font-semibold [&>p>strong]:text-[#0074A8] dark:[&>p>strong]:text-sky-300 text-pretty">
+    {isEs ? (
+      <>
+        <p>
+          Soy Luis Iván Payero, aunque la mayoría me dice Luigi. Vengo de <strong>soporte, redes e incidentes productivos</strong>. Eso cambió mi forma de trabajar con datos.
+        </p>
+        <p>
+          Aprendí a mirar sistemas vivos: qué cambió, qué depende de qué, dónde se corta el flujo y quién tiene que operar la solución después. Esa experiencia pesa cuando un reporte falla, un pipeline se rompe o un costo cloud aparece sin explicación.
+        </p>
+        <p>
+          Mi foco no es solamente construir pipelines. Es entender por qué un sistema deja de ser confiable y dejar una arquitectura más clara, mantenible y operable.
+        </p>
+      </>
+    ) : (
+      <>
+        <p>
+          I'm Luis Iván Payero, but most people call me Luigi. I come from <strong>support, networking and production incidents</strong>. That changed the way I work with data.
+        </p>
+        <p>
+          I learned to look at live systems: what changed, what depends on what, where the flow breaks and who needs to operate the solution later. That experience matters when a report fails, a pipeline breaks or a cloud cost appears without explanation.
+        </p>
+        <p>
+          My focus is not only building pipelines. It is understanding why a system stopped being reliable and leaving behind a clearer, maintainable and operable architecture.
+        </p>
+      </>
+    )}
+  </div>
+
+  <div class="order-1 md:order-2">
+    <img width="400" height="400" src="/me.png" alt={personalImageAlt} loading="lazy" decoding="async" class="mx-auto object-cover w-64 h-auto p-1 lg:p-2 lg:w-64 aspect-square rounded-[2rem] bg-white shadow-2xl shadow-slate-950/10 ring-1 ring-slate-200/80 dark:bg-white/[0.04] dark:ring-white/10 dark:shadow-black/30" style="object-position: 50% 50%">
+  </div>
+</article>

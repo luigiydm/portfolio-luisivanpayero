@@ -1,0 +1,46 @@
+---
+const currentYear = new Date().getFullYear()
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+const homePath = isEs ? "/es/" : "/"
+---
+
+<footer
+  class="opacity-80 m-4 min-[375px]:pl-4 md:pl-0 mt-20 w-full mx-auto container max-w-6xl mb-10 flex justify-center"
+>
+  <div
+    class="rounded-lg w-full max-w-screen-xl mx-auto md:flex md:items-center md:justify-between py-4"
+  >
+    <span class="text-sm sm:text-center text-zinc-800/90 dark:text-zinc-200/90"
+      >© {currentYear} Luigi Payero.
+    </span>
+    <ul
+      class="flex flex-wrap items-center mt-3 text-sm font-medium dark:text-white/90 sm:mt-0"
+    >
+      <li>
+        <a href={`${homePath}#systems`} class="hover:underline me-4 md:me-6">{isEs ? "Sistemas" : "Systems"}</a>
+      </li>
+      <li>
+        <a href={`${homePath}#case-studies`} class="hover:underline me-4 md:me-6">{isEs ? "Casos" : "Cases"}</a>
+      </li>
+      <li>
+        <a href={`${homePath}#thinking`} class="hover:underline me-4 md:me-6">{isEs ? "Cómo pienso" : "Thinking"}</a>
+      </li>
+      <li>
+        <a href={`${homePath}#about`} class="hover:underline me-4 md:me-6">{isEs ? "Sobre mí" : "About"}</a>
+      </li>
+      <li>
+        <a href={`${homePath}#stack`} class="hover:underline me-4 md:me-6">Stack</a>
+      </li>
+      <li>
+        <a href={`${homePath}#contact`} class="hover:underline"
+          >{isEs ? "Contacto" : "Contact"}</a
+        >
+      </li>
+    </ul>
+  </div>
+</footer>

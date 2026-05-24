@@ -1,0 +1,84 @@
+---
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+
+const t = isEs
+  ? {
+      eyebrow: "How I think",
+      title: "Cómo investigo sistemas",
+      intro:
+        "Trabajo los problemas de datos como incidentes de sistema: primero separo síntoma de causa, después sigo el flujo hasta encontrar dónde se perdió confiabilidad.",
+      steps: [
+        {
+          title: "Síntoma visible",
+          body: "Lo que negocio ve: dashboard lento, KPIs inconsistentes, costos altos o refreshs inestables.",
+        },
+        {
+          title: "Seguir el flujo",
+          body: "Fuentes, transformación, infraestructura y consumo. El dato cambia de forma en cada capa.",
+        },
+        {
+          title: "Fricción operativa",
+          body: "Procesos manuales, lógica duplicada, ownership difuso, rutas caras o validaciones débiles.",
+        },
+        {
+          title: "Reducir complejidad",
+          body: "Resolver con simplificación, automatización o rediseño puntual. No agregar complejidad por reflejo.",
+        },
+      ],
+    }
+  : {
+      eyebrow: "How I think",
+      title: "How I investigate systems",
+      intro:
+        "I treat data problems like system incidents: first separate symptom from cause, then trace the flow until the reliability failure becomes visible.",
+      steps: [
+        {
+          title: "Visible symptom",
+          body: "What business sees: slow dashboard, inconsistent KPIs, high costs or unstable refreshes.",
+        },
+        {
+          title: "Trace the flow",
+          body: "Sources, transformation, infrastructure and consumption. Data changes shape at every layer.",
+        },
+        {
+          title: "Find operational friction",
+          body: "Manual processes, duplicated logic, unclear ownership, expensive routes or weak validation.",
+        },
+        {
+          title: "Reduce complexity",
+          body: "Solve with simplification, automation or a targeted redesign. Do not add complexity by reflex.",
+        },
+      ],
+    }
+---
+
+<div class="rounded-[2rem] border border-slate-200/80 bg-slate-950 p-6 text-white shadow-2xl shadow-slate-950/20 dark:border-white/10 md:p-8">
+  <div class="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-sky-200">{t.eyebrow}</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight md:text-4xl">{t.title}</h2>
+      <p class="mt-5 text-base leading-7 text-slate-300">{t.intro}</p>
+    </div>
+
+    <ol class="grid gap-3">
+      {
+        t.steps.map((step, index) => (
+          <li class="grid gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5 sm:grid-cols-[auto_1fr]">
+            <span class="flex size-10 items-center justify-center rounded-full border border-sky-200/20 bg-sky-300/10 text-sm font-semibold text-sky-200">
+              0{index + 1}
+            </span>
+            <div>
+              <h3 class="text-lg font-semibold text-white">{step.title}</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-300">{step.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</div>

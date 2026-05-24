@@ -1,0 +1,85 @@
+---
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+
+const t = isEs
+  ? {
+      eyebrow: "Principio de trabajo",
+      title: "La mayoría de los problemas de datos no están donde aparecen.",
+      intro:
+        "Un dashboard lento, un costo cloud inesperado o un proceso manual suelen ser síntomas. La causa real suele vivir en otra capa del sistema.",
+      visible: "Problema visible",
+      cause: "Causa probable",
+      note:
+        "El trabajo empieza cuando dejamos de mirar solo la herramienta visible y seguimos el flujo completo: datos, transformaciones, infraestructura, ownership y consumo.",
+      examples: [
+        {
+          symptom: "Dashboard lento",
+          cause: "Modelo analítico, consultas pesadas o warehouse sin diseño para consumo",
+        },
+        {
+          symptom: "Factura AWS alta",
+          cause: "Ruta de red, tráfico invisible o servicio usando el camino equivocado",
+        },
+        {
+          symptom: "Reporting manual",
+          cause: "Proceso mal diseñado, lógica duplicada u ownership difuso",
+        },
+      ],
+    }
+  : {
+      eyebrow: "Working principle",
+      title: "Most data problems are not where they appear.",
+      intro:
+        "A slow dashboard, an unexpected cloud bill or a manual reporting process is usually a symptom. The real cause often lives in another layer of the system.",
+      visible: "Visible problem",
+      cause: "Likely real cause",
+      note:
+        "The work starts when we stop looking only at the visible tool and trace the full flow: data, transformations, infrastructure, ownership and consumption.",
+      examples: [
+        {
+          symptom: "Slow dashboard",
+          cause: "Analytical model, heavy queries or a warehouse not designed for consumption",
+        },
+        {
+          symptom: "High AWS bill",
+          cause: "Network path, invisible traffic or a service using the wrong route",
+        },
+        {
+          symptom: "Manual reporting",
+          cause: "Process design issue, duplicated logic or unclear ownership",
+        },
+      ],
+    }
+---
+
+<div class="rounded-[2rem] border border-slate-200/80 bg-white/75 p-6 shadow-xl shadow-slate-950/5 backdrop-blur dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20 md:p-8">
+  <div class="max-w-3xl">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">{t.eyebrow}</p>
+    <h2 class="mt-4 text-3xl font-bold tracking-tight text-slate-950 dark:text-white md:text-4xl">{t.title}</h2>
+    <p class="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">{t.intro}</p>
+  </div>
+
+  <div class="mt-8 overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-slate-950 text-white dark:border-white/10">
+    <div class="grid grid-cols-[1fr_auto_1fr] border-b border-white/10 px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-sky-200 sm:px-6">
+      <span>{t.visible}</span>
+      <span class="px-3 text-slate-500">→</span>
+      <span>{t.cause}</span>
+    </div>
+    {
+      t.examples.map((example) => (
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-white/10 px-4 py-5 last:border-b-0 sm:px-6">
+          <div class="text-base font-semibold text-white">{example.symptom}</div>
+          <div class="flex size-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-sky-200">→</div>
+          <div class="text-sm leading-6 text-slate-300">{example.cause}</div>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="mt-5 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{t.note}</p>
+</div>

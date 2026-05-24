@@ -1,0 +1,76 @@
+---
+import SunIcon from "./icons/Sun.astro"
+import MoonIcon from "./icons/Moon.astro"
+
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const themeLabel = lang === "es" ? "Cambiar tema de color" : "Toggle color theme"
+---
+
+<button
+  id="theme-toggle-btn"
+  type="button"
+  aria-label={themeLabel}
+  class="theme-toggle relative ml-1 mr-1 flex size-8 appearance-none items-center justify-center rounded-full border border-slate-200/70 bg-white/60 text-slate-700 transition duration-200 hover:scale-105 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 focus-visible:ring-offset-2 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-300 dark:hover:text-white dark:focus-visible:ring-offset-slate-950"
+>
+  <span class="sr-only">{themeLabel}</span>
+  <SunIcon class="theme-icon theme-icon-sun size-4" />
+  <MoonIcon class="theme-icon theme-icon-moon size-4" />
+</button>
+
+<style>
+  .theme-toggle .theme-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-origin: center;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .theme-toggle .theme-icon-sun {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-45deg);
+  }
+
+  .theme-toggle .theme-icon-moon {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+
+  :global(.dark) .theme-toggle .theme-icon-sun {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+
+  :global(.dark) .theme-toggle .theme-icon-moon {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(45deg);
+  }
+</style>
+
+<script>
+  const initThemeToggle = () => {
+    const button = document.getElementById("theme-toggle-btn")
+    if (!button || button.dataset.themeToggleBound === "true") return
+    button.dataset.themeToggleBound = "true"
+
+    button.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.contains("dark")
+      const next = isDark ? "light" : "dark"
+      localStorage.setItem("theme", next)
+      const apply = (window as any).__applyTheme as ((t: string) => void) | undefined
+      if (apply) {
+        apply(next)
+      } else {
+        document.documentElement.classList.toggle("dark", next === "dark")
+        document.documentElement.dataset.theme = next
+        document.documentElement.style.colorScheme = next
+      }
+    })
+  }
+
+  initThemeToggle()
+</script>

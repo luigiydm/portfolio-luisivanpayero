@@ -1,0 +1,369 @@
+---
+import Layout from "./Layout.astro"
+import BrandMark from "@/components/BrandMark.astro"
+
+interface Props {
+  title: string
+  description: string
+  eyebrow: string
+  date: string
+  readTime: string
+  tags: string[]
+  lang?: "en" | "es"
+  alternatePath?: string
+}
+
+const { title, description, eyebrow, date, readTime, tags, lang = "en", alternatePath } = Astro.props
+const isEs = lang === "es"
+const backHref = isEs ? "/es/#case-studies" : "/#case-studies"
+const backLabel = isEs ? "← Volver a casos técnicos" : "← Back to case studies"
+---
+
+<Layout title={`${title} — Luis Iván Payero`} description={description} lang={lang} alternatePath={alternatePath}>
+  <main class="px-4 pt-28">
+    <article class="mx-auto max-w-3xl">
+      <a href={backHref} class="inline-flex text-sm font-medium text-sky-700 hover:text-[#004F8B] dark:text-sky-300 dark:hover:text-sky-200">
+        {backLabel}
+      </a>
+
+      <header class="mt-10 rounded-[2rem] border border-sky-100 bg-white/75 p-8 shadow-2xl shadow-sky-950/5 backdrop-blur dark:border-sky-400/20 dark:bg-slate-900/75">
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">{eyebrow}</p>
+            <h1 class="mt-4 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl dark:text-white">{title}</h1>
+            <p class="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">{description}</p>
+          </div>
+          <BrandMark class="hidden size-20 shrink-0 opacity-90 sm:block" />
+        </div>
+
+        <div class="mt-7 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+          <span>{date}</span>
+          <span>·</span>
+          <span>{readTime}</span>
+        </div>
+
+        <ul class="mt-6 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <li>
+              <span class="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-[#004F8B] dark:border-sky-400/20 dark:bg-sky-400/10 dark:text-sky-200">
+                {tag}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </header>
+
+      <div class="case-study-content mt-12 rounded-[2rem] border border-sky-100 bg-white/75 p-8 shadow-xl shadow-sky-950/5 backdrop-blur dark:border-sky-400/20 dark:bg-slate-900/60">
+        <slot />
+      </div>
+    </article>
+  </main>
+
+  <dialog
+    id="diagram-lightbox"
+    class="diagram-lightbox"
+    aria-label={isEs ? "Vista ampliada del diagrama" : "Enlarged diagram view"}
+  >
+    <button
+      type="button"
+      class="diagram-lightbox__close"
+      aria-label={isEs ? "Cerrar" : "Close"}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
+        <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </button>
+    <img class="diagram-lightbox__img" alt="" />
+    <p class="diagram-lightbox__hint">{isEs ? "Tocá fuera de la imagen para cerrar" : "Tap outside the image to close"}</p>
+  </dialog>
+
+  <script>
+    const initDiagramLightbox = () => {
+      const dialog = document.getElementById("diagram-lightbox") as HTMLDialogElement | null
+      if (!dialog) return
+      const img = dialog.querySelector<HTMLImageElement>(".diagram-lightbox__img")
+      const closeBtn = dialog.querySelector<HTMLButtonElement>(".diagram-lightbox__close")
+      if (!img || !closeBtn) return
+
+      const open = (source: HTMLImageElement) => {
+        img.src = source.currentSrc || source.src
+        img.alt = source.alt
+        dialog.showModal()
+      }
+
+      document.querySelectorAll<HTMLImageElement>(".case-diagram img").forEach((source) => {
+        if (source.dataset.lightboxBound === "true") return
+        source.dataset.lightboxBound = "true"
+        source.setAttribute("role", "button")
+        source.setAttribute("tabindex", "0")
+        source.addEventListener("click", () => open(source))
+        source.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault()
+            open(source)
+          }
+        })
+      })
+
+      if (dialog.dataset.lightboxBound === "true") return
+      dialog.dataset.lightboxBound = "true"
+      closeBtn.addEventListener("click", () => dialog.close())
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close()
+      })
+    }
+
+    initDiagramLightbox()
+  </script>
+
+  <style is:global>
+    .case-study-content h2 {
+      margin-top: 2.25rem;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      line-height: 2rem;
+      font-weight: 750;
+      color: rgb(15 23 42);
+    }
+
+    .dark .case-study-content h2 {
+      color: white;
+    }
+
+    .case-study-content h2:first-child {
+      margin-top: 0;
+    }
+
+    .case-study-content p {
+      margin-bottom: 1rem;
+      color: rgb(71 85 105);
+      line-height: 1.8;
+    }
+
+    .dark .case-study-content p {
+      color: rgb(203 213 225);
+    }
+
+    .case-study-content ul {
+      margin: 1rem 0 1.5rem;
+      padding-left: 1.25rem;
+      color: rgb(71 85 105);
+      line-height: 1.8;
+      list-style: disc;
+    }
+
+    .dark .case-study-content ul {
+      color: rgb(203 213 225);
+    }
+
+    .case-study-content strong {
+      color: rgb(15 23 42);
+      font-weight: 700;
+    }
+
+    .dark .case-study-content strong {
+      color: white;
+    }
+
+    .case-study-content .case-note {
+      margin: 1.5rem 0;
+      border: 1px solid rgb(186 230 253);
+      border-radius: 1.5rem;
+      background: rgba(240, 249, 255, 0.82);
+      padding: 1.25rem;
+      color: rgb(51 65 85);
+    }
+
+    .dark .case-study-content .case-note {
+      border-color: rgba(125, 220, 255, 0.22);
+      background: rgba(56, 189, 248, 0.08);
+      color: rgb(203 213 225);
+    }
+
+    .case-study-content .case-diagram {
+      margin: 2rem 0;
+      overflow: hidden;
+      border: 1px solid rgb(226 232 240);
+      border-radius: 1.75rem;
+      background: white;
+      box-shadow: 0 24px 70px -45px rgba(2, 6, 23, 0.45);
+    }
+
+    .dark .case-study-content .case-diagram {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(2, 6, 23, 0.72);
+      box-shadow: 0 24px 70px -45px rgba(0, 0, 0, 0.8);
+    }
+
+    .case-study-content .case-diagram img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .case-study-content .case-diagram figcaption {
+      border-top: 1px solid rgb(226 232 240);
+      padding: 0.85rem 1rem;
+      color: rgb(71 85 105);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .dark .case-study-content .case-diagram figcaption {
+      border-color: rgba(255, 255, 255, 0.1);
+      color: rgb(203 213 225);
+    }
+
+    .case-study-content .case-grid {
+      display: grid;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (min-width: 768px) {
+      .case-study-content .case-grid.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .case-study-content .case-grid.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .case-study-content .case-card {
+      border: 1px solid rgb(226 232 240);
+      border-radius: 1.25rem;
+      background: rgba(248, 250, 252, 0.78);
+      padding: 1rem;
+    }
+
+    .dark .case-study-content .case-card {
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.56);
+    }
+
+    .case-study-content .case-card p:last-child,
+    .case-study-content .case-note p:last-child {
+      margin-bottom: 0;
+    }
+
+    .case-study-content .case-card__label {
+      margin-bottom: 0.5rem;
+      color: rgb(3 105 161);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .dark .case-study-content .case-card__label {
+      color: rgb(125 211 252);
+    }
+
+    .case-study-content .case-timeline {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .case-study-content .case-timeline li {
+      border-left: 2px solid rgb(14 165 233);
+      padding: 0.25rem 0 0.25rem 1rem;
+      color: rgb(71 85 105);
+    }
+
+    .dark .case-study-content .case-timeline li {
+      color: rgb(203 213 225);
+    }
+
+    .case-study-content .case-diagram img {
+      cursor: zoom-in;
+      transition: opacity 180ms ease;
+    }
+
+    .case-study-content .case-diagram img:hover,
+    .case-study-content .case-diagram img:focus-visible {
+      opacity: 0.92;
+      outline: 2px solid rgba(14, 165, 233, 0.5);
+      outline-offset: 4px;
+    }
+
+    .diagram-lightbox {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      padding: 0;
+      margin: 0;
+      inset: 0;
+      border: none;
+      background: transparent;
+      color: white;
+      overflow: hidden;
+    }
+
+    .diagram-lightbox[open] {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      place-items: center;
+    }
+
+    .diagram-lightbox::backdrop {
+      background: rgba(2, 6, 23, 0.94);
+      backdrop-filter: blur(8px);
+    }
+
+    .diagram-lightbox__img {
+      max-width: 96vw;
+      max-height: 84vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 0.75rem;
+      box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.7);
+      touch-action: pinch-zoom;
+    }
+
+    .diagram-lightbox__close {
+      position: fixed;
+      top: max(env(safe-area-inset-top, 0px), 0.75rem);
+      right: max(env(safe-area-inset-right, 0px), 0.75rem);
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(15, 23, 42, 0.7);
+      color: white;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .diagram-lightbox__close:hover,
+    .diagram-lightbox__close:focus-visible {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(125, 220, 255, 0.5);
+      outline: none;
+      transform: scale(1.04);
+    }
+
+    .diagram-lightbox__hint {
+      margin: 1rem 0 max(env(safe-area-inset-bottom, 0px), 0.75rem);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      color: rgba(226, 232, 240, 0.7);
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .diagram-lightbox__img {
+        max-width: 100vw;
+        max-height: 80vh;
+        border-radius: 0.5rem;
+      }
+    }
+  </style>
+</Layout>

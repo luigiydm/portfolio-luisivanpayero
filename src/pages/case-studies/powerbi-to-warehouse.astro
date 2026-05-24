@@ -1,0 +1,148 @@
+---
+import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
+---
+
+<CaseStudyLayout
+  title="From Power BI bottlenecks to a warehouse-first architecture"
+  eyebrow="Case Study 01"
+  date="2026"
+  readTime="8 min read"
+  description="How an overloaded BI layer was turned into a warehouse-first architecture by moving transformation ownership out of Power BI."
+  tags={["Warehouse-first", "PostgreSQL", "Power BI", "ETL", "Python"]}
+  lang="en"
+  alternatePath="/es/case-studies/powerbi-to-warehouse/"
+>
+  <h2>Summary</h2>
+  <p>
+    The visible problem was Power BI: refreshes were slow, memory usage was high and reports were becoming harder to maintain. But Power BI was not the root cause.
+  </p>
+  <p>
+    The real issue was ownership of transformation logic. The BI layer had slowly absorbed joins, filters, business rules and data shaping responsibilities that should have lived in a controlled analytical layer.
+  </p>
+  <div class="case-note">
+    <p><strong>Core idea:</strong> the dashboard was the place where the problem appeared, not the place where the system should be fixed.</p>
+  </div>
+
+  <h2>Context</h2>
+  <p>
+    The reporting layer consumed data directly from multiple operational sources: a document database storing business transactions and a relational database managing workflow state. Power BI connected to those sources, joined records, filtered historical data and calculated business metrics inside the report layer.
+  </p>
+  <p>
+    The architecture had grown organically. It worked while the volume was small, but over time the visualization tool became the place where the analytical system was being assembled.
+  </p>
+
+  <h2>Visible Problem</h2>
+  <p>
+    The dashboard refresh depended on a gateway that had to pull a large historical window, join records across different database engines and apply transformations inside Power Query.
+  </p>
+  <ul>
+    <li>Power Query transformations became memory-intensive.</li>
+    <li>Some transformations could not be pushed down to source databases.</li>
+    <li>Business logic was duplicated across reports.</li>
+    <li>Operational databases were being used as analytical sources.</li>
+  </ul>
+  <p>
+    The symptom looked like a report performance problem. The system issue was deeper: <strong>a BI tool had become responsible for too much analytical ownership.</strong>
+  </p>
+
+  <h2>Initial Hypotheses</h2>
+  <div class="case-grid cols-3">
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 01</p>
+      <p><strong>Gateway limitation.</strong> The gateway could have been the bottleneck because it was moving too much historical data through one path.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 02</p>
+      <p><strong>Power Query load.</strong> Transformations that could not be pushed down were consuming memory inside the refresh process.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 03</p>
+      <p><strong>Source design mismatch.</strong> Operational databases were being used as analytical sources without an intermediate model.</p>
+    </div>
+  </div>
+
+  <h2>Architecture Shift</h2>
+  <div class="case-grid cols-2">
+    <div class="case-card">
+      <p class="case-card__label">Before</p>
+      <p><strong>Power BI as transformation layer.</strong> Sources were queried directly, business rules were embedded in report files and refreshes depended heavily on the gateway.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">After</p>
+      <p><strong>Warehouse-first flow.</strong> Python ETL loaded curated analytical structures into PostgreSQL, and Power BI consumed a clearer model.</p>
+    </div>
+  </div>
+
+  <figure class="case-diagram">
+    <img src="/diagrama-data-platform.jpeg" alt="High-level AWS data platform architecture with sources, Airflow, EC2 ETL compute, PostgreSQL warehouse and Power BI consumers" loading="lazy" decoding="async" />
+    <figcaption>Warehouse-first flow used as the target shape: operational sources feed ETL orchestration, transformations land in PostgreSQL and Power BI consumes a curated analytical layer.</figcaption>
+  </figure>
+
+  <h2>Investigation</h2>
+  <p>
+    I traced the flow from source systems to the final report instead of tuning only the visible dashboard. The useful question was not “how do we make this report faster?” but “why is the report responsible for this much work?”.
+  </p>
+  <ul>
+    <li>Identified transformations happening inside Power Query that belonged upstream.</li>
+    <li>Separated extraction filters from presentation filters.</li>
+    <li>Looked for duplicated business rules across reports.</li>
+    <li>Mapped which parts of the flow were owned by BI files, scripts, databases and people.</li>
+  </ul>
+
+  <h2>Root Cause</h2>
+  <p>
+    The root cause was not one slow query or one bad visual. It was architectural drift. Power BI had become a hybrid of visualization tool, transformation engine and business logic container.
+  </p>
+  <p>
+    That made performance worse, but it also made ownership unclear. When logic lives inside report files, it becomes harder to test, reuse, review and operate.
+  </p>
+
+  <h2>Key Decisions</h2>
+  <p>
+    The first improvement was moving date filters earlier in the pipeline. Instead of loading everything and filtering later, the ETL extracted only the relevant window before joining sources.
+  </p>
+  <p>
+    The second improvement was using idempotent UPSERT loads. If a run failed and retried, the warehouse would converge to the same final state instead of creating duplicate rows.
+  </p>
+  <p>
+    The third improvement was modeling analytical tables explicitly instead of exposing raw operational structures to Power BI.
+  </p>
+
+  <h2>What Changed Operationally</h2>
+  <div class="case-grid cols-2">
+    <div class="case-card">
+      <p class="case-card__label">Less duplicated logic</p>
+      <p>Business rules moved into a central analytical layer instead of being copied across report files.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Less gateway dependency</p>
+      <p>The refresh path became lighter because Power BI consumed curated tables instead of pulling and shaping raw operational data.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">More reuse</p>
+      <p>New reports could use the same warehouse model instead of rebuilding the same joins and metrics.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Clearer ownership</p>
+      <p>The platform owned transformation logic; Power BI focused on reporting and consumption.</p>
+    </div>
+  </div>
+
+  <h2>Trade-offs</h2>
+  <p>
+    This added a new layer to maintain: pipelines, migrations, monitoring and documentation. But it removed a worse kind of complexity: hidden business logic inside report files that could not be easily tested, versioned or reused.
+  </p>
+
+  <h2>Result</h2>
+  <ul>
+    <li>Power BI became lighter and easier to maintain.</li>
+    <li>Business logic moved into a central warehouse layer.</li>
+    <li>New reports could reuse the same curated model.</li>
+    <li>The architecture became easier to reason about and operate.</li>
+  </ul>
+
+  <h2>Lessons Learned</h2>
+  <p>
+    A dashboard can be the most visible part of the system, but that does not mean it should own the system. Reliable reporting usually starts earlier: in data modeling, transformation ownership, operational boundaries and the path the data takes before anyone opens Power BI.
+  </p>
+</CaseStudyLayout>
