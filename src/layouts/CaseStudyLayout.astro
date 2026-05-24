@@ -15,7 +15,7 @@ interface Props {
 
 const { title, description, eyebrow, date, readTime, tags, lang = "en", alternatePath } = Astro.props
 const isEs = lang === "es"
-const backHref = isEs ? "/es/#case-studies" : "/#case-studies"
+const backHref = isEs ? "/#case-studies" : "/en/#case-studies"
 const backLabel = isEs ? "← Volver a casos técnicos" : "← Back to case studies"
 ---
 

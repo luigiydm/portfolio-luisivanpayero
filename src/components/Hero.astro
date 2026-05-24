@@ -10,7 +10,7 @@ interface Props {
 
 const { lang = "en" } = Astro.props
 const isEs = lang === "es"
-const caseHref = isEs ? "/es/#case-studies" : "/#case-studies"
+const caseHref = isEs ? "/#case-studies" : "/en/#case-studies"
 const contactHref = isEs
   ? "mailto:luisivanpayero@gmail.com?subject=Revisemos%20mi%20caso%20de%20data%20platform"
   : "mailto:luisivanpayero@gmail.com?subject=Let's%20review%20my%20data%20platform%20case"

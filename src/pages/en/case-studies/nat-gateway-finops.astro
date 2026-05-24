@@ -1,0 +1,136 @@
+---
+import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
+---
+
+<CaseStudyLayout
+  title="Why a NAT Gateway suddenly processed ~10 TB/day"
+  eyebrow="Case Study 02"
+  date="2026"
+  readTime="7 min read"
+  description="A cloud cost investigation that ended in a networking insight: private does not mean internal."
+  tags={["AWS", "FinOps", "Kubernetes", "Loki", "Networking"]}
+  lang="en"
+  alternatePath="/case-studies/nat-gateway-finops/"
+>
+  <h2>Summary</h2>
+  <p>
+    A NAT Gateway started processing an unexpected amount of traffic. In a short window, volume reached approximately 10 TB/day, creating a cost event that looked like an application or workload issue.
+  </p>
+  <p>
+    The root cause was different: Loki was reading logs stored in S3, but because the VPC had no S3 Gateway Endpoint, that traffic was routed through the NAT Gateway.
+  </p>
+  <p>
+    The key lesson: <strong>private does not automatically mean internal.</strong>
+  </p>
+
+  <h2>Context</h2>
+  <p>
+    The Kubernetes cluster used Loki as part of its observability stack. Loki stored logs in S3. The bucket was private, access was restricted and application behavior looked correct.
+  </p>
+  <p>
+    But routing is a separate concern. Without the right VPC endpoint, private subnets still use the NAT Gateway to reach S3.
+  </p>
+
+  <h2>Visible Problem</h2>
+  <p>
+    The visible signal was cost: NAT Gateway processed bytes jumped to a level that did not match normal application expectations.
+  </p>
+
+  <div class="case-grid cols-3">
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 01</p>
+      <p><strong>Production query spike.</strong> A workload might have started pulling a large dataset repeatedly.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 02</p>
+      <p><strong>Cronjob or batch process.</strong> Scheduled jobs might have generated traffic during a specific window.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 03</p>
+      <p><strong>External integration.</strong> A service might have changed behavior and started moving data through NAT.</p>
+    </div>
+  </div>
+
+  <h2>Investigation Timeline</h2>
+  <ol class="case-timeline">
+    <li><strong>Step 1:</strong> Confirmed NAT Gateway processed bytes in CloudWatch and scoped the abnormal time window.</li>
+    <li><strong>Step 2:</strong> Compared the NAT spike with pod-level network metrics in Prometheus.</li>
+    <li><strong>Step 3:</strong> Isolated Loki querier traffic as the workload matching the spike pattern.</li>
+    <li><strong>Step 4:</strong> Checked the destination path and found S3 access going through NAT instead of a Gateway Endpoint.</li>
+  </ol>
+
+  <h2>Metrics Correlation</h2>
+  <p>
+    CloudWatch showed the total NAT volume, but not the pod that caused it. Prometheus showed pod-level network receive bytes, but not whether traffic was leaving through NAT. The useful move was correlating both views by time window.
+  </p>
+  <p>
+    Once NAT processed bytes and Loki pod traffic were aligned, the investigation shifted from application behavior to network routing.
+  </p>
+
+  <figure class="case-diagram">
+    <img src="/diagrama%20nat.jpeg" alt="Before and after traffic flow showing EKS to Loki to NAT Gateway to S3 before, and EKS to Loki to S3 Gateway Endpoint to S3 after" loading="lazy" decoding="async" />
+    <figcaption>Traffic flow before and after the fix. The expensive path was not S3 itself, but reaching S3 through NAT from private subnets.</figcaption>
+  </figure>
+
+  <h2>Root Cause</h2>
+  <p>
+    Loki was configured to use S3 as its object store. The configuration was valid. The expensive part was not Loki itself, but the network path from the cluster to S3.
+  </p>
+  <p>
+    Since the VPC did not have an S3 Gateway Endpoint, requests from private subnets reached S3 through the NAT Gateway. AWS charges NAT Gateway processing per GB, so a heavy log query became a cloud cost event.
+  </p>
+
+  <h2>Resolution</h2>
+  <p>
+    The fix was adding an S3 Gateway Endpoint to the VPC route tables used by the private subnets. Loki did not need application-level changes. The route changed; the workload kept working.
+  </p>
+
+  <h2>Operational Impact</h2>
+  <div class="case-grid cols-2">
+    <div class="case-card">
+      <p class="case-card__label">Cost path removed</p>
+      <p>High-volume S3 traffic stopped being processed by the NAT Gateway.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">No app rewrite</p>
+      <p>The workload behavior stayed the same. The infrastructure route changed.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Better investigation pattern</p>
+      <p>The team gained a method for connecting cloud cost signals with workload-level metrics.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Clearer platform rule</p>
+      <p>Private AWS services still need explicit private network paths.</p>
+    </div>
+  </div>
+
+  <h2>Reusable FinOps Pattern</h2>
+  <p>
+    This became a reusable investigation pattern for cloud cost anomalies: start with the billing signal, identify the infrastructure component, correlate with workload metrics and then validate the route table or service endpoint involved.
+  </p>
+  <ul>
+    <li>CloudWatch for NAT processed bytes.</li>
+    <li>Prometheus for pod-level traffic.</li>
+    <li>Route tables and VPC endpoints for path validation.</li>
+    <li>Known high-volume services such as logs, backups, exports and analytics workloads.</li>
+  </ul>
+
+  <h2>Trade-offs</h2>
+  <p>
+    The fix was simple, but the investigation was not. The main trade-off is operational discipline: VPC endpoints and route tables need to be part of platform design reviews, not added only after costs spike.
+  </p>
+
+  <h2>Result</h2>
+  <ul>
+    <li>NAT Gateway traffic returned to normal levels.</li>
+    <li>The cost path was removed without changing Loki behavior.</li>
+    <li>The investigation method became reusable for future FinOps work.</li>
+    <li>The team gained a clearer rule: private buckets still need private network paths.</li>
+  </ul>
+
+  <h2>What I Would Improve Next</h2>
+  <p>
+    The next step is not only preventing this exact issue. It is building a repeatable cloud cost investigation runbook: NAT metrics, VPC endpoints, pod-level traffic, route tables and known high-volume services.
+  </p>
+</CaseStudyLayout>

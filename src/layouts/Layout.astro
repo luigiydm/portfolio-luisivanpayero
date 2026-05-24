@@ -14,7 +14,7 @@ interface Props {
 
 const { description, title, lang = "en", alternatePath } = Astro.props
 const pathname = Astro.url.pathname.replace(/\/$/, "") || "/"
-const shouldShowLogoIntro = pathname === "/" || pathname === "/es"
+const shouldShowLogoIntro = pathname === "/" || pathname === "/en"
 
 const siteUrl = Astro.site ?? new URL("https://luisivanpayero.com/")
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString()
@@ -39,7 +39,7 @@ const ogLocaleAlt = lang === "es" ? "en_US" : "es_ES"
     <link rel="canonical" href={canonicalUrl} />
     {alternateUrl && <link rel="alternate" hreflang={otherLang} href={alternateUrl} />}
     <link rel="alternate" hreflang={lang} href={canonicalUrl} />
-    {alternateUrl && <link rel="alternate" hreflang="x-default" href={lang === "en" ? canonicalUrl : alternateUrl} />}
+    {alternateUrl && <link rel="alternate" hreflang="x-default" href={lang === "es" ? canonicalUrl : alternateUrl} />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Luis Iván Payero" />
     <meta property="og:title" content={title} />

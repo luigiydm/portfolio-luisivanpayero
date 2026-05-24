@@ -8,13 +8,13 @@ interface Props {
 
 const { lang = "en", alternatePath } = Astro.props
 const isEs = lang === "es"
-const homePath = isEs ? "/es/" : "/"
+const homePath = isEs ? "/" : "/en/"
 const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/"
-const isHome = isEs ? currentPath === "/es" : currentPath === "/"
+const isHome = isEs ? currentPath === "/" : currentPath === "/en"
 const sectionHref = (id: string) => (isHome ? `#${id}` : `${homePath}#${id}`)
 const langSwitch = isEs
-  ? { title: "EN", label: "Switch to English", url: alternatePath ?? "/" }
-  : { title: "ES", label: "Cambiar a español", url: alternatePath ?? "/es/" }
+  ? { title: "EN", label: "Switch to English", url: alternatePath ?? "/en/" }
+  : { title: "ES", label: "Cambiar a español", url: alternatePath ?? "/" }
 
 const navItems = [
   {

@@ -3,122 +3,122 @@ import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
 ---
 
 <CaseStudyLayout
-  title="Low-cost static hosting architecture for a real business"
-  eyebrow="Case Study 03"
+  title="Arquitectura de hosting estático low-cost para un negocio real"
+  eyebrow="Caso Técnico 03"
   date="2026"
-  readTime="6 min read"
-  description="How a traditional business got a fast, secure and maintainable web presence using static architecture, S3, Cloudflare and Terraform."
-  tags={["AWS S3", "Cloudflare", "Terraform", "Static Hosting", "Security"]}
-  lang="en"
-  alternatePath="/es/case-studies/static-hosting-casa-lucho/"
+  readTime="6 min de lectura"
+  description="Cómo un negocio tradicional consiguió presencia online rápida, segura y mantenible usando arquitectura estática, S3, Cloudflare y Terraform."
+  tags={["AWS S3", "Cloudflare", "Terraform", "Static Hosting", "Seguridad"]}
+  lang="es"
+  alternatePath="/en/case-studies/static-hosting-casa-lucho/"
 >
-  <h2>Summary</h2>
+  <h2>Resumen</h2>
   <p>
-    A traditional business needed a professional online presence: fast, secure, easy to maintain and with almost no operating cost.
+    Un negocio tradicional necesitaba presencia online profesional: rápida, segura, fácil de mantener y casi sin costo operativo.
   </p>
   <p>
-    The answer was not a heavy CMS, a server, a database or a platform with monthly fees. The right architecture was static hosting: S3 for origin storage, Cloudflare for DNS, CDN and TLS, Terraform for repeatable infrastructure and a restricted origin path.
-  </p>
-
-  <h2>Context</h2>
-  <p>
-    This was a real business need, not a portfolio experiment. The site had to be useful for my father's work, which meant the solution needed to be reliable without creating operational overhead.
-  </p>
-  <p>
-    The human part mattered, but the engineering requirement was still simple: solve the actual problem with the lowest long-term maintenance burden.
+    La respuesta no era un CMS pesado, un servidor, una base de datos o una plataforma con pagos mensuales. La arquitectura correcta era hosting estático: S3 como origen, Cloudflare para DNS, CDN y TLS, Terraform para infraestructura repetible y una ruta de origen restringida.
   </p>
 
-  <h2>Visible Problem</h2>
+  <h2>Contexto</h2>
   <p>
-    The business needed a credible website, but the risk was choosing an architecture that created more work than value.
+    Era una necesidad real de negocio, no un experimento de portfolio. El sitio tenía que servir para el trabajo de mi papá, así que la solución debía ser confiable sin crear carga operativa.
+  </p>
+  <p>
+    El componente humano importaba, pero el requisito técnico seguía siendo simple: resolver el problema real con el menor mantenimiento posible en el tiempo.
+  </p>
+
+  <h2>Problema Visible</h2>
+  <p>
+    El negocio necesitaba una web creíble, pero el riesgo era elegir una arquitectura que generara más trabajo que valor.
   </p>
   <div class="case-grid cols-3">
     <div class="case-card">
-      <p class="case-card__label">Option 01</p>
-      <p><strong>Website builder.</strong> Fast to start, but tied to a platform and monthly cost.</p>
+      <p class="case-card__label">Opción 01</p>
+      <p><strong>Website builder.</strong> Rápido para arrancar, pero atado a una plataforma y costo mensual.</p>
     </div>
     <div class="case-card">
-      <p class="case-card__label">Option 02</p>
-      <p><strong>Traditional hosting.</strong> Familiar, but unnecessary for a simple static presence.</p>
+      <p class="case-card__label">Opción 02</p>
+      <p><strong>Hosting tradicional.</strong> Conocido, pero innecesario para una presencia estática simple.</p>
     </div>
     <div class="case-card">
-      <p class="case-card__label">Option 03</p>
-      <p><strong>Static architecture.</strong> Lower moving parts, lower cost and easier reliability.</p>
+      <p class="case-card__label">Opción 03</p>
+      <p><strong>Arquitectura estática.</strong> Menos partes móviles, menor costo y confiabilidad más simple.</p>
     </div>
   </div>
 
-  <h2>Architecture</h2>
+  <h2>Arquitectura</h2>
   <p>
-    The architecture keeps the origin simple and moves delivery concerns to Cloudflare. S3 stores static files, Cloudflare handles DNS, CDN, TLS and cache, and Terraform keeps infrastructure changes explicit.
+    La arquitectura mantiene el origen simple y mueve la entrega a Cloudflare. S3 almacena archivos estáticos, Cloudflare maneja DNS, CDN, TLS y cache, y Terraform deja los cambios de infraestructura explícitos.
   </p>
 
   <figure class="case-diagram">
-    <img src="/ARQUITECTURA_INFRAESTRUCTURA_AWS_CASA_LUCHO_MCP_BASIC.png" alt="Static hosting architecture for Casa Lucho using Cloudflare, S3, Terraform and restricted bucket policy" loading="lazy" decoding="async" />
-    <figcaption>Static hosting architecture used as-is: visitors reach Cloudflare, cache misses go to S3, Terraform manages deployment and bucket policy restricts direct origin access.</figcaption>
+    <img src="/ARQUITECTURA_INFRAESTRUCTURA_AWS_CASA_LUCHO_MCP_BASIC.png" alt="Arquitectura de hosting estático para Casa Lucho usando Cloudflare, S3, Terraform y bucket policy restringida" loading="lazy" decoding="async" />
+    <figcaption>Arquitectura de hosting estático usada tal cual: visitantes llegan a Cloudflare, los cache misses van a S3, Terraform gestiona despliegue y la bucket policy restringe acceso directo al origen.</figcaption>
   </figure>
 
-  <h2>Key Decisions</h2>
+  <h2>Decisiones Clave</h2>
   <ul>
-    <li>Use static files because the site did not need server-side rendering or a database.</li>
-    <li>Use S3 as a low-cost origin for HTML, assets and optimized images.</li>
-    <li>Use Cloudflare for DNS, CDN, TLS and cache behavior.</li>
-    <li>Use Terraform so the infrastructure could be reviewed and recreated.</li>
-    <li>Restrict direct S3 access so the public path stays through Cloudflare.</li>
+    <li>Usar archivos estáticos porque el sitio no necesitaba server-side rendering ni base de datos.</li>
+    <li>Usar S3 como origen low-cost para HTML, assets e imágenes optimizadas.</li>
+    <li>Usar Cloudflare para DNS, CDN, TLS y comportamiento de cache.</li>
+    <li>Usar Terraform para que la infraestructura pudiera revisarse y recrearse.</li>
+    <li>Restringir acceso directo a S3 para que la ruta pública pase por Cloudflare.</li>
   </ul>
 
-  <h2>Security Considerations</h2>
+  <h2>Consideraciones de Seguridad</h2>
   <p>
-    A small website does not need complex security, but it still needs the right boundaries. The important part was avoiding a publicly exposed origin and keeping the deployment process repeatable.
+    Una web chica no necesita seguridad compleja, pero sí límites correctos. Lo importante fue evitar un origen público sin control y mantener el proceso de deploy repetible.
   </p>
   <div class="case-grid cols-2">
     <div class="case-card">
-      <p class="case-card__label">Restricted origin</p>
-      <p>Bucket policy limits direct access and keeps Cloudflare as the intended public entry point.</p>
+      <p class="case-card__label">Origen restringido</p>
+      <p>La bucket policy limita acceso directo y mantiene Cloudflare como entrada pública esperada.</p>
     </div>
     <div class="case-card">
-      <p class="case-card__label">No runtime surface</p>
-      <p>No server, no database and no admin panel means fewer moving parts to patch or monitor.</p>
+      <p class="case-card__label">Sin superficie runtime</p>
+      <p>Sin servidor, sin base de datos y sin panel admin significa menos piezas para parchear o monitorear.</p>
     </div>
   </div>
 
-  <h2>Performance and Cost</h2>
+  <h2>Performance y Costo</h2>
   <div class="case-grid cols-3">
     <div class="case-card">
       <p class="case-card__label">Lighthouse</p>
-      <p><strong>98/100</strong> on the measured page.</p>
+      <p><strong>98/100</strong> en la página medida.</p>
     </div>
     <div class="case-card">
       <p class="case-card__label">LCP</p>
-      <p><strong>1.4s</strong> with optimized static delivery.</p>
+      <p><strong>1.4s</strong> con entrega estática optimizada.</p>
     </div>
     <div class="case-card">
-      <p class="case-card__label">Cost</p>
-      <p><strong>Practically zero</strong> using S3 low usage and Cloudflare free tier.</p>
+      <p class="case-card__label">Costo</p>
+      <p><strong>Prácticamente cero</strong> usando bajo uso de S3 y plan free de Cloudflare.</p>
     </div>
   </div>
 
   <h2>Trade-offs</h2>
   <p>
-    Static architecture is not always the answer. It is the right answer when the content is mostly informational, updates are controlled and the business does not need dynamic backend behavior.
+    La arquitectura estática no siempre es la respuesta. Es la respuesta correcta cuando el contenido es principalmente informativo, las actualizaciones son controladas y el negocio no necesita comportamiento backend dinámico.
   </p>
   <p>
-    The trade-off is accepting a simpler content workflow in exchange for lower operational cost, better performance and fewer failure modes.
+    El trade-off es aceptar un flujo de contenido más simple a cambio de menor costo operativo, mejor performance y menos modos de falla.
   </p>
 
-  <h2>Result</h2>
+  <h2>Resultado</h2>
   <ul>
-    <li>A fast and professional web presence for a real business.</li>
-    <li>Almost no runtime infrastructure to operate.</li>
-    <li>Repeatable deployment with Terraform and AWS CLI.</li>
-    <li>Secure-enough delivery path for the actual risk profile.</li>
+    <li>Presencia online rápida y profesional para un negocio real.</li>
+    <li>Casi nada de infraestructura runtime para operar.</li>
+    <li>Deploy repetible con Terraform y AWS CLI.</li>
+    <li>Ruta de entrega suficientemente segura para el perfil de riesgo real.</li>
   </ul>
 
   <p>
-    <a href="https://casa-lucho.com/" target="_blank" rel="noopener noreferrer" class="font-semibold text-sky-700 hover:text-[#004F8B] dark:text-sky-300 dark:hover:text-sky-200">View live site →</a>
+    <a href="https://casa-lucho.com/" target="_blank" rel="noopener noreferrer" class="font-semibold text-sky-700 hover:text-[#004F8B] dark:text-sky-300 dark:hover:text-sky-200">Ver sitio →</a>
   </p>
 
-  <h2>Lesson Learned</h2>
+  <h2>Lección Aprendida</h2>
   <p>
-    The best architecture is not the most complex one. It is the one that solves the right problem with the lowest operational cost.
+    La mejor arquitectura no es la más compleja. Es la que resuelve el problema correcto con el menor costo operativo.
   </p>
 </CaseStudyLayout>
