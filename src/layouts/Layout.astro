@@ -18,7 +18,7 @@ const shouldShowLogoIntro = pathname === "/" || pathname === "/es"
 
 const siteUrl = Astro.site ?? new URL("https://luisivanpayero.com/")
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString()
-const ogImage = new URL("/porfolio.webp", siteUrl).toString()
+const ogImage = new URL("/og.png", siteUrl).toString()
 const otherLang = lang === "es" ? "en" : "es"
 const alternateUrl = alternatePath ? new URL(alternatePath, siteUrl).toString() : null
 const ogLocale = lang === "es" ? "es_ES" : "en_US"
@@ -46,8 +46,10 @@ const ogLocaleAlt = lang === "es" ? "en_US" : "es_ES"
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="960" />
-    <meta property="og:image:height" content="720" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Luis Iván Payero — Luigi Dev · Data Platforms · Reporting Reliability · AWS" />
     <meta property="og:locale" content={ogLocale} />
     <meta property="og:locale:alternate" content={ogLocaleAlt} />
     <meta name="twitter:card" content="summary_large_image" />
