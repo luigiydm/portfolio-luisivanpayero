@@ -18,13 +18,15 @@ const t = isEs
   ? {
       badge: "IA útil empieza antes del chatbot",
       kicker: "Data Engineering · Capas de datos · Analytics · IA operacional",
-      title: "Datos confiables para analytics, automatización e IA.",
-      subtitle:
-        "Ayudo a equipos con datos dispersos a construir capas de datos operables: ETLs, modelos analíticos, métricas confiables y bases listas para dashboards, automatizaciones o consultas con IA. No empiezo por el chatbot ni por el dashboard: empiezo por las fuentes, los procesos, las reglas de negocio y dónde se rompe la confiabilidad del dato.",
+      title: "Construyo capas de datos confiables para analytics, automatización e IA.",
+      subtitle: [
+        "Ayudo a equipos con datos dispersos a ordenar fuentes, ETLs, modelos analíticos y métricas para que dashboards, procesos automatizados o consultas con IA respondan sobre datos trazables, no sobre intuición.",
+        "No empiezo por el chatbot ni por el dashboard: empiezo por las fuentes, los procesos, las reglas de negocio y dónde se rompe la confiabilidad del dato.",
+      ],
       contact: "Contame tu caso",
       read: "Ver casos reales",
       linkedIn: "Hablar por LinkedIn",
-      chips: ["Capas de datos operables", "Pipelines estables", "Métricas confiables", "Listo para IA"],
+      chips: ["Capas de datos operables", "Pipelines estables", "Métricas confiables", "Datos listos para IA"],
       approach: "Entro al barro del dato",
       cardTitle: "El problema visible rara vez es el problema real.",
       cardBody:
@@ -49,13 +51,15 @@ const t = isEs
   : {
       badge: "Useful AI starts before the chatbot",
       kicker: "Data Engineering · Data layers · Analytics · Operational AI",
-      title: "Reliable data for analytics, automation and AI.",
-      subtitle:
-        "I help teams with scattered data build operable data layers: ETLs, analytical models, trustworthy metrics and a base ready for dashboards, automation or AI queries. I do not start with the chatbot or the dashboard: I start with the sources, the processes, the business rules and where data reliability breaks.",
+      title: "I build reliable data layers for analytics, automation and AI.",
+      subtitle: [
+        "I help teams with scattered data sort out sources, ETLs, analytical models and metrics so dashboards, automated processes or AI queries answer over traceable data, not guesswork.",
+        "I don't start with the chatbot or the dashboard: I start with the sources, the processes, the business rules and where data reliability breaks.",
+      ],
       contact: "Tell me about your case",
       read: "See real cases",
       linkedIn: "Talk on LinkedIn",
-      chips: ["Operable data layers", "Stable pipelines", "Trustworthy metrics", "AI-ready"],
+      chips: ["Operable data layers", "Stable pipelines", "Trustworthy metrics", "AI-ready data"],
       approach: "I get into the data mess",
       cardTitle: "The visible problem is rarely the real problem.",
       cardBody:
@@ -102,9 +106,9 @@ const t = isEs
       {t.title}
     </h1>
 
-    <p class="hero-reveal max-w-2xl mt-6 text-lg leading-8 text-slate-700 sm:text-xl dark:text-slate-300" style="--hero-delay: 300ms">
-      {t.subtitle}
-    </p>
+    <div class="hero-reveal max-w-2xl mt-6 space-y-4 text-lg leading-8 text-slate-700 sm:text-xl dark:text-slate-300" style="--hero-delay: 300ms">
+      {t.subtitle.map((para) => <p>{para}</p>)}
+    </div>
 
     <div class="hero-reveal flex flex-wrap gap-2.5 mt-7 text-sm text-slate-600 dark:text-zinc-300" style="--hero-delay: 370ms">
       {t.chips.map((chip) => (
