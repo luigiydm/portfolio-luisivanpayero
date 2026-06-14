@@ -1,0 +1,116 @@
+---
+import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
+---
+
+<CaseStudyLayout
+  title="De datos dispersos a una capa consultable por IA"
+  eyebrow="Caso Técnico 01"
+  date="2026"
+  readTime="9 min de lectura"
+  description="Cómo un pedido de 'queremos un chatbot sobre nuestros datos' se convirtió primero en un trabajo de data engineering: ordenar fuentes, definir métricas y construir una capa confiable antes de sumar IA."
+  tags={["Data Engineering", "ETL", "PostgreSQL", "IA", "Métricas"]}
+  lang="es"
+  alternatePath="/en/case-studies/data-layer-for-ai/"
+>
+  <h2>Resumen</h2>
+  <p>
+    El pedido visible era claro: "queremos un chatbot que responda preguntas sobre nuestros datos". El problema real no era el chatbot. Eran datos dispersos entre varios productos, métricas sin una definición única y reglas de negocio que vivían en la cabeza de algunas personas.
+  </p>
+  <p>
+    Antes de conectar cualquier modelo de IA, había que construir algo más aburrido y más importante: una capa de datos confiable, curada y consultable.
+  </p>
+  <div class="case-note">
+    <p><strong>Idea central:</strong> la IA no arregla datos mal modelados. Solo los hace parecer más accesibles. Si la base no es confiable, una respuesta fluida puede ser una respuesta equivocada con buena redacción.</p>
+  </div>
+
+  <h2>Contexto</h2>
+  <p>
+    El negocio operaba con varios productos distintos, cada uno con su propia forma de generar datos: bases relacionales con transacciones y estados, fuentes documentales con información semiestructurada y algunas APIs externas. Cada producto tenía su propio vocabulario y sus propias reglas implícitas.
+  </p>
+  <p>
+    La expectativa, impulsada por el ruido del mercado, era saltar directo al chatbot. La realidad era que ni siquiera había una definición compartida de las métricas básicas del negocio.
+  </p>
+  <p>
+    Por confidencialidad, este caso está escrito de forma sanitizada: sin datos reales, nombres de productos ni cifras internas. El foco está en el enfoque y las decisiones, no en la información del cliente.
+  </p>
+
+  <h2>Problema Visible</h2>
+  <ul>
+    <li>Fuentes dispersas: cada producto guardaba sus datos en lugares y formatos distintos.</li>
+    <li>Métricas sin definir: la misma palabra significaba cosas distintas según el equipo.</li>
+    <li>Reglas de negocio escondidas: lógica crítica que nunca se había escrito.</li>
+    <li>Datos sensibles sin un control claro de quién accede a qué.</li>
+    <li>La idea de un chatbot respondiendo sobre datos en los que nadie confiaba del todo.</li>
+  </ul>
+  <p>
+    El síntoma parecía "nos falta IA". El problema de sistema era más profundo: <strong>no había una base de datos confiable sobre la cual una IA pudiera responder.</strong>
+  </p>
+
+  <h2>Hipótesis Iniciales</h2>
+  <div class="case-grid cols-3">
+    <div class="case-card">
+      <p class="case-card__label">Hipótesis 01</p>
+      <p><strong>Fragmentación de fuentes.</strong> El problema no era de modelo, sino que los datos vivían en silos sin un punto de unión.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hipótesis 02</p>
+      <p><strong>Métricas ambiguas.</strong> Sin definiciones únicas, cualquier respuesta automática iba a ser inconsistente entre productos.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hipótesis 03</p>
+      <p><strong>Reglas implícitas.</strong> La lógica de negocio sin documentar haría que la IA infiriera mal el contexto.</p>
+    </div>
+  </div>
+
+  <h2>Enfoque</h2>
+  <p>
+    En lugar de empezar por el chatbot, empecé por las fuentes. La pregunta útil no era "qué modelo usamos", sino "qué tendría que ser verdad en los datos para que cualquier respuesta sea confiable".
+  </p>
+  <ul>
+    <li>Mapeé cada fuente: qué genera, con qué frecuencia, qué calidad tiene y quién es dueño.</li>
+    <li>Construí ETLs para llevar fuentes relacionales, documentales y APIs hacia un modelo común.</li>
+    <li>Aterricé los datos en un modelo curado en PostgreSQL, separando lo operacional de lo analítico.</li>
+    <li>Definí métricas explícitas, con una sola fuente de verdad por concepto.</li>
+    <li>Hice explícitas las reglas de negocio que antes vivían solo en personas.</li>
+  </ul>
+
+  <h2>Arquitectura</h2>
+  <div class="case-grid cols-2">
+    <div class="case-card">
+      <p class="case-card__label">Antes</p>
+      <p><strong>Datos dispersos.</strong> Cada producto con su silo, sin métricas compartidas y sin una capa pensada para consultas confiables.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Después</p>
+      <p><strong>Capa curada y consultable.</strong> ETLs hacia un modelo en PostgreSQL, métricas definidas y una superficie clara para dashboards, automatizaciones o IA.</p>
+    </div>
+  </div>
+
+  <h2>Datos Sensibles y Límites</h2>
+  <p>
+    Habilitar consultas asistidas por IA sobre datos internos obliga a tomar en serio el control de acceso. No alcanza con que el modelo responda; importa qué datos puede ver y qué nunca debería exponer.
+  </p>
+  <ul>
+    <li>Separé datos sensibles de la capa consultable de propósito general.</li>
+    <li>Definí qué preguntas tienen respuesta confiable y cuáles quedan fuera de alcance.</li>
+    <li>Dejé la capa de IA como consumidora de un modelo curado, no como acceso directo a las fuentes crudas.</li>
+  </ul>
+
+  <h2>Trade-offs</h2>
+  <p>
+    Este enfoque agrega una capa para mantener: pipelines, definiciones de métricas, monitoreo y documentación. Y es más lento que conectar un chatbot a lo que ya existe. Pero evita un problema peor: una IA que responde rápido y con seguridad sobre datos que nadie validó.
+  </p>
+
+  <h2>Resultado</h2>
+  <ul>
+    <li>Una base de datos confiable y curada, con métricas definidas una sola vez.</li>
+    <li>Reglas de negocio escritas y revisables, en vez de conocimiento disperso.</li>
+    <li>Una capa lista para dashboards, automatizaciones o consultas asistidas por IA.</li>
+    <li>Una IA que, cuando llega, responde sobre datos en los que se puede confiar.</li>
+  </ul>
+
+  <h2>Lecciones Aprendidas</h2>
+  <p>
+    La parte más visible de un proyecto de IA es el chatbot, pero rara vez es donde está el trabajo real. La IA útil empieza antes: en las fuentes, las métricas, las reglas de negocio y el control de los datos sensibles. Si esa base no existe, la IA no resuelve el problema; solo lo hace más difícil de detectar.
+  </p>
+</CaseStudyLayout>

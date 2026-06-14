@@ -1,6 +1,6 @@
 # portfolio-luisivanpayero
 
-Portfolio personal de **Luis Iván Payero** — troubleshooting de data platforms, reporting reliability y AWS.
+Portfolio personal de **Luis Iván Payero** — data engineering para IA operacional: capas de datos confiables para analytics, automatización e IA.
 
 🌐 [luisivanpayero.com](https://luisivanpayero.com/) · 🇪🇸 / 🇬🇧 bilingüe
 
