@@ -1,0 +1,116 @@
+---
+import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
+---
+
+<CaseStudyLayout
+  title="From scattered data to a layer an AI can query"
+  eyebrow="Case Study 01"
+  date="2026"
+  readTime="9 min read"
+  description="How a 'we want a chatbot over our data' request turned first into a data engineering job: unify sources, define metrics and build a trustworthy layer before adding AI."
+  tags={["Data Engineering", "ETL", "PostgreSQL", "AI", "Metrics"]}
+  lang="en"
+  alternatePath="/case-studies/data-layer-for-ai/"
+>
+  <h2>Summary</h2>
+  <p>
+    The visible ask was clear: "we want a chatbot that answers questions about our data". The real problem was not the chatbot. It was data scattered across several products, metrics with no single definition, and business rules that lived only in a few people's heads.
+  </p>
+  <p>
+    Before connecting any AI model, we had to build something more boring and more important: a trustworthy, curated, queryable data layer.
+  </p>
+  <div class="case-note">
+    <p><strong>Core idea:</strong> AI does not fix badly modeled data. It only makes it look more accessible. If the base is not reliable, a fluent answer can be a wrong answer that is well written.</p>
+  </div>
+
+  <h2>Context</h2>
+  <p>
+    The business ran several distinct products, each generating data in its own way: relational databases with transactions and states, document sources with semi-structured information, and a few external APIs. Each product had its own vocabulary and its own implicit rules.
+  </p>
+  <p>
+    The expectation, driven by market noise, was to jump straight to the chatbot. The reality was that there was not even a shared definition of the basic business metrics.
+  </p>
+  <p>
+    For confidentiality, this case is written in a sanitized way: no real data, product names or internal figures. The focus is on the approach and the decisions, not on client information.
+  </p>
+
+  <h2>Visible Problem</h2>
+  <ul>
+    <li>Scattered sources: each product stored its data in different places and formats.</li>
+    <li>Undefined metrics: the same word meant different things to different teams.</li>
+    <li>Hidden business rules: critical logic that had never been written down.</li>
+    <li>Sensitive data with no clear control over who can access what.</li>
+    <li>The idea of a chatbot answering over data nobody fully trusted.</li>
+  </ul>
+  <p>
+    The symptom looked like "we are missing AI". The system problem was deeper: <strong>there was no trustworthy database for an AI to answer from.</strong>
+  </p>
+
+  <h2>Initial Hypotheses</h2>
+  <div class="case-grid cols-3">
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 01</p>
+      <p><strong>Source fragmentation.</strong> The problem was not the model, but that data lived in silos with no joining point.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 02</p>
+      <p><strong>Ambiguous metrics.</strong> Without single definitions, any automated answer would be inconsistent across products.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Hypothesis 03</p>
+      <p><strong>Implicit rules.</strong> Undocumented business logic would make the AI infer context badly.</p>
+    </div>
+  </div>
+
+  <h2>Approach</h2>
+  <p>
+    Instead of starting with the chatbot, I started with the sources. The useful question was not "which model do we use", but "what would have to be true in the data for any answer to be trustworthy".
+  </p>
+  <ul>
+    <li>Mapped every source: what it generates, how often, what quality it has and who owns it.</li>
+    <li>Built ETLs to move relational, document and API sources into a common model.</li>
+    <li>Landed the data in a curated PostgreSQL model, separating operational from analytical.</li>
+    <li>Defined explicit metrics, with a single source of truth per concept.</li>
+    <li>Made business rules explicit instead of leaving them in people's heads.</li>
+  </ul>
+
+  <h2>Architecture</h2>
+  <div class="case-grid cols-2">
+    <div class="case-card">
+      <p class="case-card__label">Before</p>
+      <p><strong>Scattered data.</strong> Each product in its own silo, no shared metrics and no layer designed for trustworthy queries.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">After</p>
+      <p><strong>Curated, queryable layer.</strong> ETLs into a PostgreSQL model, defined metrics and a clear surface for dashboards, automation or AI.</p>
+    </div>
+  </div>
+
+  <h2>Sensitive Data and Limits</h2>
+  <p>
+    Enabling AI-assisted queries over internal data forces you to take access control seriously. It is not enough for the model to answer; what matters is which data it can see and what it should never expose.
+  </p>
+  <ul>
+    <li>Separated sensitive data from the general-purpose queryable layer.</li>
+    <li>Defined which questions have a trustworthy answer and which are out of scope.</li>
+    <li>Left the AI layer as a consumer of a curated model, not as direct access to raw sources.</li>
+  </ul>
+
+  <h2>Trade-offs</h2>
+  <p>
+    This approach adds a layer to maintain: pipelines, metric definitions, monitoring and documentation. And it is slower than wiring a chatbot to whatever already exists. But it avoids a worse problem: an AI that answers fast and confidently over data nobody validated.
+  </p>
+
+  <h2>Result</h2>
+  <ul>
+    <li>A trustworthy, curated database, with metrics defined once.</li>
+    <li>Business rules written down and reviewable, instead of scattered knowledge.</li>
+    <li>A layer ready for dashboards, automation or AI-assisted queries.</li>
+    <li>An AI that, when it arrives, answers over data you can actually trust.</li>
+  </ul>
+
+  <h2>Lessons Learned</h2>
+  <p>
+    The most visible part of an AI project is the chatbot, but it is rarely where the real work is. Useful AI starts earlier: in the sources, the metrics, the business rules and the control of sensitive data. If that base does not exist, AI does not solve the problem; it only makes it harder to spot.
+  </p>
+</CaseStudyLayout>

@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro"
 
 import AboutMe from "@/components/AboutMe.astro"
+import AiReadiness from "@/components/AiReadiness.astro"
 import CodeIcon from "@/components/icons/Code.astro"
 import ContactCTA from "@/components/ContactCTA.astro"
 import ProfileCheck from "@/components/icons/ProfileCheck.astro"
@@ -17,8 +18,8 @@ import BookOpen from "@/components/icons/BookOpen.astro"
 ---
 
 <Layout
-  title="Luis Iván Payero — Data Platform & Reporting Reliability"
-  description="Troubleshooting-oriented Data Platform and Analytics Engineering: reliable reporting, warehouse-first architecture, AWS FinOps and production data systems."
+  title="Luis Iván Payero — Data Engineering for operational AI"
+  description="I build reliable data layers for analytics, automation and AI: ETLs, analytical models and metrics. Useful AI starts before the chatbot."
   lang="en"
   alternatePath="/"
 >
@@ -30,6 +31,10 @@ import BookOpen from "@/components/icons/BookOpen.astro"
     <div class="space-y-24 md:space-y-32">
       <SectionContainer id="systems">
         <ProblemReality lang="en" />
+      </SectionContainer>
+
+      <SectionContainer id="ai">
+        <AiReadiness lang="en" />
       </SectionContainer>
 
       <SectionContainer id="case-studies">

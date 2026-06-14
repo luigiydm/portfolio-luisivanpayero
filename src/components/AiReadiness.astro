@@ -1,0 +1,68 @@
+---
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+
+const t = isEs
+  ? {
+      eyebrow: "Data Engineering para IA operacional",
+      title: "Antes de poner IA, ordená los datos.",
+      intro:
+        "La mayoría de los proyectos de IA interna no fallan por el modelo. Fallan por lo que hay debajo: datos dispersos, métricas sin definir y reglas de negocio que nadie escribió.",
+      itemsLabel: "Lo que suele estar roto antes del chatbot",
+      items: [
+        "Fuentes dispersas",
+        "ETLs frágiles",
+        "Métricas no definidas",
+        "Reglas de negocio escondidas",
+        "Datos sensibles sin control",
+        "Chatbot que responde sobre datos poco confiables",
+      ],
+      punchline: "La IA no arregla datos mal modelados. Solo los hace parecer más accesibles.",
+    }
+  : {
+      eyebrow: "Data engineering for operational AI",
+      title: "Before adding AI, fix the data.",
+      intro:
+        "Most internal AI projects do not fail because of the model. They fail because of what is underneath: scattered data, undefined metrics and business rules nobody ever wrote down.",
+      itemsLabel: "What is usually broken before the chatbot",
+      items: [
+        "Scattered sources",
+        "Fragile ETLs",
+        "Undefined metrics",
+        "Hidden business rules",
+        "Sensitive data without control",
+        "A chatbot answering over unreliable data",
+      ],
+      punchline: "AI does not fix badly modeled data. It only makes it look more accessible.",
+    }
+---
+
+<div class="rounded-[2rem] border border-slate-200/80 bg-white/75 p-6 shadow-xl shadow-slate-950/5 backdrop-blur dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20 md:p-8">
+  <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">{t.eyebrow}</p>
+      <h2 class="mt-4 text-3xl font-bold tracking-tight text-slate-950 dark:text-white md:text-4xl">{t.title}</h2>
+      <p class="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">{t.intro}</p>
+    </div>
+
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t.itemsLabel}</p>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+        {t.items.map((item) => (
+          <li class="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white/60 px-4 py-3 text-sm leading-6 text-slate-700 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200">
+            <span class="mt-2 size-2 shrink-0 rounded-full bg-[#00AEEF]"></span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-8 rounded-[1.5rem] bg-slate-950 p-6 text-white dark:bg-white dark:text-slate-950 md:p-7">
+    <p class="text-xl font-semibold leading-8 md:text-2xl">{t.punchline}</p>
+  </div>
+</div>

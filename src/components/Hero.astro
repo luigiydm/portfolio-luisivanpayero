@@ -12,28 +12,28 @@ const { lang = "en" } = Astro.props
 const isEs = lang === "es"
 const caseHref = isEs ? "/#case-studies" : "/en/#case-studies"
 const contactHref = isEs
-  ? "mailto:luisivanpayero@gmail.com?subject=Revisemos%20mi%20caso%20de%20data%20platform"
-  : "mailto:luisivanpayero@gmail.com?subject=Let's%20review%20my%20data%20platform%20case"
+  ? "mailto:luisivanpayero@gmail.com?subject=Quiero%20usar%20IA%20sobre%20mis%20datos%20internos"
+  : "mailto:luisivanpayero@gmail.com?subject=I%20want%20to%20use%20AI%20on%20my%20internal%20data"
 const t = isEs
   ? {
-      badge: "Cuando el problema no es el dashboard",
-      kicker: "Troubleshooting · Data Platforms · Reporting Reliability · AWS",
-      title: "Reporting confiable empieza antes de Power BI.",
+      badge: "IA útil empieza antes del chatbot",
+      kicker: "Data Engineering · Capas de datos · Analytics · IA operacional",
+      title: "Datos confiables para analytics, automatización e IA.",
       subtitle:
-        "Ayudo a equipos a investigar por qué sus sistemas de reporting dejan de ser confiables: datos dispersos, procesos manuales, pipelines frágiles, ownership difuso o costos cloud que crecen sin explicación.",
-      contact: "Contame qué está fallando",
+        "Ayudo a equipos con datos dispersos a construir capas de datos operables: ETLs, modelos analíticos, métricas confiables y bases listas para dashboards, automatizaciones o consultas con IA. No empiezo por el chatbot ni por el dashboard: empiezo por las fuentes, los procesos, las reglas de negocio y dónde se rompe la confiabilidad del dato.",
+      contact: "Contame tu caso",
       read: "Ver casos reales",
       linkedIn: "Hablar por LinkedIn",
-      chips: ["Datos confiables", "Pipelines estables", "Reporting que escala", "Costos visibles"],
+      chips: ["Capas de datos operables", "Pipelines estables", "Métricas confiables", "Listo para IA"],
       approach: "Entro al barro del dato",
       cardTitle: "El problema visible rara vez es el problema real.",
       cardBody:
-        "Vengo de soporte, redes y aplicaciones productivas. Eso me ayuda a investigar sistemas vivos: no miro solo el reporte, miro fuentes, procesos, infraestructura, costos, ownership y cómo opera el equipo.",
+        "Vengo de soporte, redes y aplicaciones productivas. Eso me ayuda a investigar sistemas vivos: no miro solo el reporte ni el chatbot, miro fuentes, procesos, infraestructura, costos, ownership y cómo opera el equipo.",
       signalsTitle: "Cuándo puedo ayudarte",
       signals: [
-        "El reporte falla, tarda demasiado o nadie confía del todo en los números.",
+        "Querés usar IA o automatizar sobre datos internos, pero las fuentes están dispersas.",
         "El proceso depende de Excel, pasos manuales o conocimiento que vive en una sola persona.",
-        "Hay costos, errores o cuellos de botella que aparecen pero nadie termina de explicar.",
+        "Nadie confía del todo en los números, o aparecen costos y errores sin explicación.",
       ],
       mapLabel: "Mapa de investigación",
       mapFooter: "El objetivo no es culpar a la herramienta visible. Es encontrar dónde se rompe el flujo.",
@@ -41,30 +41,30 @@ const t = isEs
         { title: "Fuentes", body: "Bases, APIs, archivos" },
         { title: "Procesos", body: "Cargas, reglas, validaciones" },
         { title: "Modelo", body: "Métricas y capa analítica" },
-        { title: "Reporte", body: "Power BI, KPIs, consumo" },
+        { title: "Consumo", body: "Dashboards, IA, automatización" },
       ],
       outcomeTitle: "Resultado buscado",
-      outcome: "Pasar de apagar incendios de datos a tener procesos claros, mantenibles y confiables.",
+      outcome: "Pasar de datos dispersos a una capa confiable, operable y lista para analytics, automatización o IA.",
     }
   : {
-      badge: "When the dashboard is not the real problem",
-      kicker: "Troubleshooting · Data Platforms · Reporting Reliability · AWS",
-      title: "Reliable reporting starts before Power BI.",
+      badge: "Useful AI starts before the chatbot",
+      kicker: "Data Engineering · Data layers · Analytics · Operational AI",
+      title: "Reliable data for analytics, automation and AI.",
       subtitle:
-        "I help teams investigate why reporting systems stop being reliable: scattered data, manual processes, fragile pipelines, unclear ownership or cloud costs growing without explanation.",
-      contact: "Tell me what's failing",
+        "I help teams with scattered data build operable data layers: ETLs, analytical models, trustworthy metrics and a base ready for dashboards, automation or AI queries. I do not start with the chatbot or the dashboard: I start with the sources, the processes, the business rules and where data reliability breaks.",
+      contact: "Tell me about your case",
       read: "See real cases",
       linkedIn: "Talk on LinkedIn",
-      chips: ["Trustworthy data", "Stable pipelines", "Reporting that scales", "Visible costs"],
+      chips: ["Operable data layers", "Stable pipelines", "Trustworthy metrics", "AI-ready"],
       approach: "I get into the data mess",
       cardTitle: "The visible problem is rarely the real problem.",
       cardBody:
-        "I come from support, networking and production applications. That helps me investigate live systems: I do not only look at the report, I look at sources, processes, infrastructure, costs, ownership and how the team operates.",
+        "I come from support, networking and production applications. That helps me investigate live systems: I do not only look at the report or the chatbot, I look at sources, processes, infrastructure, costs, ownership and how the team operates.",
       signalsTitle: "When I can help",
       signals: [
-        "The report fails, takes too long or people do not fully trust the numbers.",
+        "You want to use AI or automate on internal data, but the sources are scattered.",
         "The process depends on Excel, manual steps or knowledge that lives with one person.",
-        "Costs, errors or bottlenecks appear but nobody can fully explain them.",
+        "People do not fully trust the numbers, or costs and errors appear without explanation.",
       ],
       mapLabel: "Investigation map",
       mapFooter: "The goal is not to blame the visible tool. It is to find where the flow breaks.",
@@ -72,10 +72,10 @@ const t = isEs
         { title: "Sources", body: "Databases, APIs, files" },
         { title: "Processes", body: "Loads, rules, checks" },
         { title: "Model", body: "Metrics and analytics layer" },
-        { title: "Report", body: "Power BI, KPIs, usage" },
+        { title: "Consumption", body: "Dashboards, AI, automation" },
       ],
       outcomeTitle: "Target outcome",
-      outcome: "Move from firefighting data issues to clear, maintainable and trustworthy processes.",
+      outcome: "Move from scattered data to a trustworthy, operable layer ready for analytics, automation or AI.",
     }
 ---
 <div class="grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] xl:gap-16">

@@ -10,6 +10,15 @@ const isEs = lang === "es"
 const CASES_EN = [
   {
     number: "01",
+    title: "From scattered data to a layer an AI can query",
+    problem: "The ask was \"we want a chatbot over our data\". The real problem was scattered sources, undefined metrics and hidden business rules.",
+    approach: "Unified relational, document and API sources into ETLs feeding a curated model, defined the metrics and left a queryable layer with limits and control over sensitive data.",
+    result: "A trustworthy base that enables dashboards, automation and AI-assisted queries over data you can actually rely on.",
+    tags: ["Data Engineering", "ETL", "PostgreSQL", "AI", "Metrics"],
+    href: "/en/case-studies/data-layer-for-ai/",
+  },
+  {
+    number: "02",
     title: "From Power BI bottlenecks to a warehouse-first architecture",
     problem: "The visible issue was slow refreshes. The real issue was transformation ownership living inside the BI layer.",
     approach: "Traced source queries, Power Query transformations and gateway constraints before moving business logic into Python ETL + PostgreSQL models.",
@@ -18,7 +27,7 @@ const CASES_EN = [
     href: "/en/case-studies/powerbi-to-warehouse/",
   },
   {
-    number: "02",
+    number: "03",
     title: "Why a NAT Gateway suddenly processed ~10 TB/day",
     problem: "A cloud cost spike looked like an application issue, but the root cause was a routing path between Loki and S3.",
     approach: "Correlated CloudWatch NAT traffic with pod-level Prometheus metrics, isolated Loki and validated the S3 route.",
@@ -27,7 +36,7 @@ const CASES_EN = [
     href: "/en/case-studies/nat-gateway-finops/",
   },
   {
-    number: "03",
+    number: "04",
     title: "Low-cost static hosting architecture for a real business",
     problem: "A traditional business needed a professional web presence without adding operational weight or monthly platform cost.",
     approach: "Used static hosting with S3, Cloudflare and Terraform, keeping the origin restricted and the delivery path simple.",
@@ -40,6 +49,15 @@ const CASES_EN = [
 const CASES_ES = [
   {
     number: "01",
+    title: "De datos dispersos a una capa consultable por IA",
+    problem: "El pedido era \"queremos un chatbot sobre nuestros datos\". El problema real eran fuentes dispersas, métricas sin definir y reglas de negocio escondidas.",
+    approach: "Unifiqué fuentes relacionales, documentales y APIs en ETLs hacia un modelo curado, definí las métricas y dejé una capa consultable con límites y control de datos sensibles.",
+    result: "Una base confiable que habilita dashboards, automatizaciones y consultas asistidas por IA sobre datos en los que se puede confiar.",
+    tags: ["Data Engineering", "ETL", "PostgreSQL", "IA", "Métricas"],
+    href: "/case-studies/data-layer-for-ai/",
+  },
+  {
+    number: "02",
     title: "De cuellos de botella en Power BI a una arquitectura warehouse-first",
     problem: "El síntoma visible eran refreshs lentos. El problema real era que la lógica de transformación vivía dentro de la capa de BI.",
     approach: "Seguí consultas origen, transformaciones de Power Query y límites del gateway antes de mover reglas a Python ETL + modelos PostgreSQL.",
@@ -48,7 +66,7 @@ const CASES_ES = [
     href: "/case-studies/powerbi-to-warehouse/",
   },
   {
-    number: "02",
+    number: "03",
     title: "Por qué un NAT Gateway procesó de golpe ~10 TB/día",
     problem: "Un pico de costo parecía un problema de aplicación, pero la causa raíz era la ruta de red entre Loki y S3.",
     approach: "Crucé tráfico NAT en CloudWatch con métricas por pod en Prometheus, aislé Loki y validé la ruta hacia S3.",
@@ -57,7 +75,7 @@ const CASES_ES = [
     href: "/case-studies/nat-gateway-finops/",
   },
   {
-    number: "03",
+    number: "04",
     title: "Arquitectura de hosting estático low-cost para un negocio real",
     problem: "Un negocio tradicional necesitaba presencia online profesional sin sumar peso operativo ni costo mensual de plataforma.",
     approach: "Usé hosting estático con S3, Cloudflare y Terraform, manteniendo el origen restringido y una ruta de entrega simple.",
