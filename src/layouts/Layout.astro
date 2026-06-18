@@ -4,6 +4,7 @@ import "@fontsource-variable/onest"
 import Header from "../components/Header.astro"
 import Footer from "../components/Footer.astro"
 import LogoIntro from "../components/LogoIntro.astro"
+import Analytics from "../components/Analytics.astro"
 
 interface Props {
   title: string
@@ -56,6 +57,7 @@ const ogLocaleAlt = lang === "es" ? "en_US" : "es_ES"
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <Analytics />
     <script is:inline>
       ;(() => {
         const getTheme = () => {

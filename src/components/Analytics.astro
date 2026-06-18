@@ -1,0 +1,125 @@
+---
+// Umami analytics — privacy-first, cookieless. Single source of truth for
+// event tracking via click delegation: no per-link wiring is required.
+//
+// Replace the two placeholders below with your self-hosted Umami values.
+// The tracking layer is vendor-agnostic: swap the `track()` body to move to
+// another provider without touching any link or component.
+const UMAMI_SRC = "https://analytics.luisivanpayero.com/script.js"
+const UMAMI_WEBSITE_ID = "REPLACE_WITH_UMAMI_WEBSITE_ID"
+---
+
+<script is:inline defer src={UMAMI_SRC} data-website-id={UMAMI_WEBSITE_ID}></script>
+
+<script is:inline>
+  ;(() => {
+    if (window.__analyticsBound) return
+    window.__analyticsBound = true
+
+    // Single provider abstraction. Page views are auto-tracked by Umami.
+    const track = (name, props) => {
+      try {
+        if (window.umami && typeof window.umami.track === "function") {
+          window.umami.track(name, props)
+        }
+      } catch {}
+    }
+
+    const lang = () => (document.documentElement.lang === "es" ? "es" : "en")
+
+    const sectionOf = (el) => {
+      const section = el.closest("section[id]")
+      if (section && section.id) return section.id
+      if (el.closest("footer")) return "footer"
+      return "hero"
+    }
+
+    const caseIdFromPath = (path) => {
+      const match = path.match(/\/case-studies\/([^/]+)\/?/)
+      return match ? match[1] : "unknown"
+    }
+
+    document.addEventListener("click", (event) => {
+      const target = event.target
+      if (!target || !target.closest) return
+
+      // Diagram lightbox — images are not wrapped in anchors.
+      if (target.closest(".case-diagram img")) {
+        track("diagram_zoom", { case_id: caseIdFromPath(location.pathname), lang: lang() })
+        return
+      }
+
+      const link = target.closest("a")
+      if (!link) return
+      const href = link.getAttribute("href") || ""
+
+      // Contact — email (primary conversion).
+      if (href.startsWith("mailto:")) {
+        track("contact_click", { method: "email", location: sectionOf(link), lang: lang() })
+        return
+      }
+
+      // Contact — LinkedIn (secondary conversion).
+      if (href.includes("linkedin.com")) {
+        track("contact_click", { method: "linkedin", location: sectionOf(link), lang: lang() })
+        return
+      }
+
+      // Language switch (Header).
+      if (link.matches('[aria-label="Switch to English"], [aria-label="Cambiar a español"]')) {
+        track("language_switch", { to: href.startsWith("/en") ? "en" : "es", lang: lang() })
+        return
+      }
+
+      // Case study detail (home cards). Hash anchors like "#case-studies"
+      // do not match this path pattern, so navigation is not counted here.
+      if (/\/case-studies\/[^/]+\/?/.test(href)) {
+        track("case_study_click", { case_id: caseIdFromPath(href), location: "home_card", lang: lang() })
+        return
+      }
+
+      // "See cases" CTA (hero + stack), excluding header nav and footer.
+      if (href.includes("#case-studies") && !link.hasAttribute("data-section-link") && !link.closest("footer")) {
+        track("cta_see_cases", { location: sectionOf(link), lang: lang() })
+        return
+      }
+
+      // Outbound links (external project sites, etc.).
+      if (/^https?:\/\//.test(href)) {
+        try {
+          const url = new URL(href, location.href)
+          if (url.host !== location.host) {
+            track("outbound_click", { domain: url.host, location: sectionOf(link), lang: lang() })
+          }
+        } catch {}
+      }
+    })
+
+    // Scroll depth — fire once per threshold.
+    const marks = [25, 50, 75, 100]
+    const fired = new Set()
+    let ticking = false
+    const checkDepth = () => {
+      ticking = false
+      const doc = document.documentElement
+      const scrollable = doc.scrollHeight - doc.clientHeight
+      if (scrollable <= 0) return
+      const percent = ((window.scrollY || doc.scrollTop) / scrollable) * 100
+      for (const mark of marks) {
+        if (percent >= mark && !fired.has(mark)) {
+          fired.add(mark)
+          track("scroll_depth", { percent: mark, lang: lang() })
+        }
+      }
+    }
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return
+        ticking = true
+        window.requestAnimationFrame(checkDepth)
+      },
+      { passive: true }
+    )
+  })()
+</script>
