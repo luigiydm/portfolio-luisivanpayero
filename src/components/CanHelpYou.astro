@@ -1,0 +1,117 @@
+---
+import MailIcon from "@/components/icons/Mail.astro"
+
+interface Props {
+  lang?: "en" | "es"
+}
+
+const { lang = "en" } = Astro.props
+const isEs = lang === "es"
+const offerHref = isEs
+  ? "mailto:luisivanpayero@gmail.com?subject=Quiero%20un%20diagn%C3%B3stico%20de%20reporting%20y%20datos"
+  : "mailto:luisivanpayero@gmail.com?subject=I'd%20like%20a%20reporting%20and%20data%20diagnostic"
+
+const t = isEs
+  ? {
+      eyebrow: "Servicios",
+      title: "Te puedo ayudar si…",
+      pains: [
+        "Armás reportes a mano todas las semanas o todos los meses.",
+        "Tenés datos repartidos entre Excel, Power BI, sistemas internos, bases, CSVs o APIs.",
+        "Tus dashboards son lentos, frágiles o nadie confía del todo en los números.",
+        "Copiás y pegás información entre sistemas para llegar a un resultado.",
+        "Querés usar IA, pero antes necesitás ordenar fuentes, reglas de negocio y métricas.",
+        "Tenés procesos administrativos u operativos repetitivos que podrían automatizarse.",
+      ],
+      offerLabel: "Oferta de entrada",
+      offerTitle: "Diagnóstico de reporting y datos",
+      offerBody:
+        "Reviso tu proceso actual, las fuentes de datos, los reportes existentes y los puntos manuales que hoy consumen tiempo o generan errores.",
+      offerMapLabel: "Salís con un mapa claro:",
+      offerMap: [
+        "qué está pasando hoy",
+        "dónde se pierde tiempo",
+        "qué datos no cierran",
+        "qué se puede automatizar primero",
+        "qué conviene dejar como está",
+        "una propuesta concreta de MVP si tiene sentido avanzar",
+      ],
+      offerNote:
+        "No hace falta que sepas si necesitás un ETL, una base analítica, un dashboard, IA o una automatización. Alcanza con tener un proceso que hoy sea lento, manual o difícil de mantener.",
+      offerCta: "Pedir un diagnóstico",
+    }
+  : {
+      eyebrow: "Services",
+      title: "I can help you if…",
+      pains: [
+        "You build reports by hand every week or every month.",
+        "Your data is spread across Excel, Power BI, internal systems, databases, CSVs or APIs.",
+        "Your dashboards are slow, fragile or nobody fully trusts the numbers.",
+        "You copy and paste information between systems to reach a result.",
+        "You want to use AI, but first you need to sort out sources, business rules and metrics.",
+        "You have repetitive admin or operational processes that could be automated.",
+      ],
+      offerLabel: "Entry offer",
+      offerTitle: "Reporting and data diagnostic",
+      offerBody:
+        "I review your current process, the data sources, the existing reports and the manual steps that today eat time or cause errors.",
+      offerMapLabel: "You walk away with a clear map:",
+      offerMap: [
+        "what is happening today",
+        "where time is lost",
+        "which numbers don't add up",
+        "what to automate first",
+        "what is better left as is",
+        "a concrete MVP proposal if it makes sense to move forward",
+      ],
+      offerNote:
+        "You don't need to know whether you need an ETL, an analytical database, a dashboard, AI or an automation. Having a process that is slow, manual or hard to maintain is enough.",
+      offerCta: "Request a diagnostic",
+    }
+---
+
+<div class="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+  <div class="rounded-[2rem] border border-slate-200/80 bg-white/75 p-6 shadow-xl shadow-slate-950/5 backdrop-blur dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20 md:p-8">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#0074A8] dark:text-sky-300">{t.eyebrow}</p>
+    <h2 class="mt-4 text-3xl font-bold tracking-tight text-slate-950 dark:text-white md:text-4xl">{t.title}</h2>
+
+    <ul class="mt-7 space-y-3">
+      {t.pains.map((pain) => (
+        <li class="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-white/60 px-4 py-3 text-sm leading-6 text-slate-700 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200">
+          <span class="mt-2 size-2 shrink-0 rounded-full bg-[#00AEEF]"></span>
+          <span>{pain}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="relative overflow-hidden rounded-[2rem] border border-slate-200/80 bg-slate-950 p-6 text-white shadow-2xl shadow-slate-950/20 dark:border-white/10 md:p-8">
+    <div class="absolute -right-20 -top-20 size-56 rounded-full bg-[#00AEEF]/20 blur-3xl"></div>
+
+    <div class="relative">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-sky-200">{t.offerLabel}</p>
+      <h3 class="mt-3 text-2xl font-bold tracking-tight md:text-3xl">{t.offerTitle}</h3>
+      <p class="mt-4 text-base leading-7 text-slate-300">{t.offerBody}</p>
+
+      <p class="mt-6 text-sm font-semibold text-white">{t.offerMapLabel}</p>
+      <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+        {t.offerMap.map((item) => (
+          <li class="flex items-start gap-2 text-sm leading-6 text-slate-300">
+            <span class="mt-2 size-1.5 shrink-0 rounded-full bg-sky-300"></span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p class="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-6 text-slate-300">{t.offerNote}</p>
+
+      <a
+        href={offerHref}
+        class="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-0.5 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      >
+        <MailIcon class="size-4" />
+        {t.offerCta}
+      </a>
+    </div>
+  </div>
+</div>
