@@ -17,19 +17,17 @@ const t = isEs
       eyebrow: "Siguiente paso",
       title: "Mandame el reporte, proceso o problema que hoy te está trabando.",
       description:
-        "No hace falta que tengas clara la solución. Con que me cuentes qué te está comiendo tiempo o qué número no cierra, alcanza para empezar.",
+        "No hace falta que tengas clara la solución ni un brief formal. Con contarme qué proceso te está comiendo tiempo o qué número no cierra, alcanza para empezar.",
       primary: "Contame tu caso",
       secondary: "Escribime por LinkedIn",
-      note: "No hace falta un brief formal. Con describir lo que hoy te traba alcanza.",
     }
   : {
       eyebrow: "Next step",
       title: "Send me the report, process or problem that's slowing you down today.",
       description:
-        "You don't need to have the solution figured out. Just tell me what's eating your time or which number doesn't add up — that's enough to start.",
+        "You don't need to have the solution figured out, or a formal brief. Just tell me which process is eating your time or which number doesn't add up — that's enough to start.",
       primary: "Tell me about your case",
       secondary: "Message me on LinkedIn",
-      note: "You do not need a formal brief. Describing what's blocking you today is enough.",
     }
 ---
 
@@ -42,7 +40,6 @@ const t = isEs
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-sky-200">{t.eyebrow}</p>
       <h2 class="mt-4 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">{t.title}</h2>
       <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300">{t.description}</p>
-      <p class="mt-4 text-sm text-sky-100">{t.note}</p>
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row lg:flex-col">
