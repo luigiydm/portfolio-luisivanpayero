@@ -9,27 +9,27 @@ interface Props {
 const { lang = "en" } = Astro.props
 const isEs = lang === "es"
 const contactHref = isEs
-  ? "mailto:luisivanpayero@gmail.com?subject=Quiero%20usar%20IA%20sobre%20mis%20datos%20internos"
-  : "mailto:luisivanpayero@gmail.com?subject=I%20want%20to%20use%20AI%20on%20my%20internal%20data"
+  ? "mailto:luisivanpayero@gmail.com?subject=Quiero%20contarte%20un%20problema%20de%20reportes%20o%20datos"
+  : "mailto:luisivanpayero@gmail.com?subject=I%20want%20to%20tell%20you%20about%20a%20reporting%20or%20data%20problem"
 
 const t = isEs
   ? {
       eyebrow: "Siguiente paso",
-      title: "¿Tu empresa quiere consultar datos con IA, pero primero hay que ordenar fuentes, reglas y métricas?",
+      title: "Mandame el reporte, proceso o problema que hoy te está trabando.",
       description:
-        "Contame qué tenés hoy: qué fuentes, qué procesos, qué reglas y qué querés consultar o automatizar. Vemos con calma qué hace falta ordenar antes de sumar IA, dashboards o automatizaciones.",
+        "No hace falta que tengas clara la solución. Con que me cuentes qué te está comiendo tiempo o qué número no cierra, alcanza para empezar.",
       primary: "Contame tu caso",
       secondary: "Escribime por LinkedIn",
-      note: "No hace falta un brief formal. Con describir lo que querés lograr con tus datos alcanza.",
+      note: "No hace falta un brief formal. Con describir lo que hoy te traba alcanza.",
     }
   : {
       eyebrow: "Next step",
-      title: "Does your company want to query data with AI, but first you need to sort out sources, rules and metrics?",
+      title: "Send me the report, process or problem that's slowing you down today.",
       description:
-        "Tell me what you have today: which sources, which processes, which rules and what you want to query or automate. We can look at it calmly and see what needs sorting out before adding AI, dashboards or automation.",
+        "You don't need to have the solution figured out. Just tell me what's eating your time or which number doesn't add up — that's enough to start.",
       primary: "Tell me about your case",
       secondary: "Message me on LinkedIn",
-      note: "You do not need a formal brief. A clear description of what you want to do with your data is enough.",
+      note: "You do not need a formal brief. Describing what's blocking you today is enough.",
     }
 ---
 

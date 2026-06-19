@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro"
 
 import AboutMe from "@/components/AboutMe.astro"
 import AiReadiness from "@/components/AiReadiness.astro"
+import CanHelpYou from "@/components/CanHelpYou.astro"
 import CodeIcon from "@/components/icons/Code.astro"
 import ContactCTA from "@/components/ContactCTA.astro"
 import ProfileCheck from "@/components/icons/ProfileCheck.astro"
@@ -29,6 +30,10 @@ import BookOpen from "@/components/icons/BookOpen.astro"
     </SectionContainer>
 
     <div class="space-y-24 md:space-y-32">
+      <SectionContainer id="help">
+        <CanHelpYou lang="en" />
+      </SectionContainer>
+
       <SectionContainer id="systems">
         <ProblemReality lang="en" />
       </SectionContainer>
