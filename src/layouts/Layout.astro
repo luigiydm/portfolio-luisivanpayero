@@ -82,6 +82,39 @@ const ogLocaleAlt = lang === "es" ? "en_US" : "es_ES"
       src="https://analytics.luisivanpayero.com/script.js"
       data-website-id="d64f1e17-b210-4b99-90b7-b8b98483bbb8"
       is:inline></script>
+    <script is:inline>
+      // Eventos Umami: contacto, case studies e idioma. No-op si Umami no cargó.
+      ;(() => {
+        const track = (name, data) => {
+          if (window.umami && typeof window.umami.track === "function") window.umami.track(name, data)
+        }
+        document.addEventListener("click", (e) => {
+          const link = e.target.closest("a[href]")
+          if (!link) return
+          const href = link.getAttribute("href") || ""
+          const idioma = location.pathname.startsWith("/en") ? "en" : "es"
+          if (href.startsWith("mailto:")) {
+            let asunto = ""
+            try {
+              asunto = decodeURIComponent((href.split("subject=")[1] || "").split("&")[0]).slice(0, 60)
+            } catch {}
+            track("contacto_click", { red: "email", asunto, idioma })
+          } else if (href.includes("linkedin.com")) {
+            track("contacto_click", { red: "linkedin", idioma })
+          } else if (href.includes("github.com")) {
+            track("contacto_click", { red: "github", idioma })
+          } else if (href.includes("/case-studies/")) {
+            const caso = href.split("/case-studies/")[1].replace(/\/$/, "")
+            if (caso) track("case_study_click", { caso, idioma })
+          } else {
+            const txt = (link.textContent || "").trim()
+            if ((txt === "EN" || txt === "ES") && link.closest("header")) {
+              track("idioma_cambio", { a: txt.toLowerCase() })
+            }
+          }
+        })
+      })()
+    </script>
   </head>
 
   <body class="relative text-slate-950 dark:text-zinc-50">
