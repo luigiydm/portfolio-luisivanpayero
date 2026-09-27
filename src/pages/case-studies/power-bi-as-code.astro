@@ -1,0 +1,192 @@
+---
+import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
+import WorkflowShift from "@/components/case-study/pbip/WorkflowShift.astro"
+import CrossFileBug from "@/components/case-study/pbip/CrossFileBug.astro"
+import LevelsStrip from "@/components/case-study/pbip/LevelsStrip.astro"
+import GuardrailPipeline from "@/components/case-study/pbip/GuardrailPipeline.astro"
+import ProofChain from "@/components/case-study/pbip/ProofChain.astro"
+
+const REPO = "https://github.com/luigiydm/pbip-guardrails"
+
+const diff = `  "filter": { "In": {
+    "Expressions": [ Stages[Order] ],
+-   "Values": [ [ 3 ] ]
++   "Values": [ [ 2 ], [ 3 ] ]
+  } }`
+
+const dax = `Deals at stage =
+    VAR _order = MAX ( Stages[Order] )
+    RETURN
+        CALCULATE ( COUNTROWS ( Deals ), Stages[Order] = _order )`
+
+const lint = `$ pbip lint examples/broken --family 'Segment (\\d+)'
+  'Pipeline' [filters] cardVisual b0000000000000000001: Order IN ['2L', '3L']
+      -> ['Deals at stage'] depend(s) on the row's Order: the value shown may not match the filter`
+
+const rows = [
+  ["Una medida que ya no existe", "—", "✓"],
+  ["Filtro de varios valores + medida con MAX", "—", "✓"],
+  ["Un visual que cruza métricas de dos poblaciones", "—", "✓"],
+  ["Un visual duplicado tapado por otro", "—", "✓"],
+  ["Un visual fuera del canvas", "✓ (aviso)", "✓"],
+  ["TMDL que no se puede parsear", "✓ (cualquier error)", "un solo patrón conocido"],
+]
+---
+
+<CaseStudyLayout
+  title="Qué pasó cuando empecé a tratar los reportes de Power BI como código"
+  eyebrow="Caso Técnico 05"
+  date="2026"
+  readTime="8 min de lectura"
+  description="Cómo PBIP, Git y un pequeño toolkit de validación me dejaron usar agentes de IA para modificar reportes rápido, sin perder el diff, la validación ni la vuelta atrás."
+  tags={["Power BI", "PBIP", "Agentes de IA", "Git", "CI/CD", "Python"]}
+  lang="es"
+  alternatePath="/en/case-studies/power-bi-as-code/"
+>
+  <h2>Resumen</h2>
+  <p>
+    Empecé a desarrollar reportes de Power BI con agentes de IA trabajando directamente sobre los archivos del proyecto. Me hizo muchísimo más rápido. También me obligó a responder una pregunta que antes no tenía:
+  </p>
+  <p class="case-note">
+    <strong>¿Cuánta autonomía le puedo dar a un agente antes de necesitar controles de ingeniería más fuertes?</strong>
+  </p>
+  <p>
+    Este caso cuenta cómo fue cambiando mi forma de trabajar: qué ganó el desarrollo al pasar por el agente, qué tipo de riesgo nuevo apareció y qué controles tuve que ir agregando a medida que el agente hacía cambios más grandes.
+  </p>
+
+  <h2>El cambio: de una interfaz a un proyecto</h2>
+  <p>
+    Durante años, un reporte de Power BI fue un archivo <code>.pbix</code>: un binario que se edita con clics en Power BI Desktop. Con el formato de proyecto (PBIP), el modelo pasa a ser <strong>TMDL</strong> y el reporte pasa a ser <strong>PBIR</strong>: carpetas de archivos de texto que se pueden leer, comparar y versionar.
+  </p>
+  <p>
+    Eso cambió algo más profundo que el formato. Un agente de IA que trabaja con archivos ahora puede agregar un visual, cambiar un filtro, reorganizar una página o refactorizar medidas. La unidad de trabajo dejó de ser una interfaz y pasó a ser un proyecto.
+  </p>
+
+  <WorkflowShift lang="es" />
+
+  <p>
+    Hay herramientas que le dan al agente formas de interactuar con Power BI, y son útiles. Para mi forma de trabajar, lo que más pesó fue otra cosa: tener un artefacto versionable que el agente modifica como si fuera código. Las dos ideas se complementan.
+  </p>
+
+  <h2>El problema: más rápido para todo, también para romper</h2>
+  <p>
+    Si un agente puede cambiar un reporte entero en segundos, también puede romperlo en segundos. Y los errores más peligrosos no son los que impiden abrir el proyecto: son los que dejan un número que se ve bien y está mal.
+  </p>
+  <p>Un ejemplo concreto. El agente cambia el filtro de una tarjeta para que incluya dos etapas del embudo:</p>
+
+  <pre class="my-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100"><code set:text={diff} /></pre>
+
+  <p>Y la medida que muestra esa tarjeta, en otra carpeta del proyecto, resuelve la fila con <code>MAX</code>:</p>
+
+  <pre class="my-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100"><code set:text={dax} /></pre>
+
+  <CrossFileBug lang="es" />
+
+  <p>
+    Las dos piezas, por separado, son válidas. Juntas, el filtro admite las etapas 2 y 3, pero la medida usa <code>MAX</code> y termina resolviendo solo la 3: el valor mostrado puede no representar el contexto que el visual aparenta tener. Nada está mal formado, así que ningún validador estructural tiene por qué marcarlo.
+  </p>
+  <p>
+    No es un caso de laboratorio. En un reporte real, un visual llegó a mostrar una tasa de conversión imposible, por encima del 100%. La medida era válida; el problema era el contexto de filtro que le pasaba el visual. El ejemplo de arriba es su equivalente sintético, y cualquiera puede reproducirlo desde el repo.
+  </p>
+  <p>
+    El filtro vive en el reporte y la medida en el modelo. <strong>Nadie estaba evaluando la relación entre las dos.</strong>
+  </p>
+
+  <h2>Válido no es lo mismo que correcto</h2>
+  <p>
+    Lo que me ordenó la cabeza fue separar tres preguntas distintas, que necesitan tres tipos de control distintos. Para la primera ya había herramientas. Para la segunda no encontré ninguna, y de ahí terminó saliendo <a class="font-semibold text-sky-700 underline dark:text-sky-300" href={REPO}>pbip-guardrails</a>.
+  </p>
+
+  <LevelsStrip lang="es" />
+
+  <h2>Los controles alrededor del agente</h2>
+  <p>
+    Con eso en claro, el flujo quedó así. No es un pipeline automático de punta a punta: algunos pasos los hace una herramienta y otros los decide una persona, y el diagrama los distingue.
+  </p>
+
+  <GuardrailPipeline lang="es" />
+
+  <ol class="case-timeline">
+    <li><strong>Un estado conocido en Git.</strong> No arranqué con este proceso: fue apareciendo a medida que el agente hacía cambios más grandes. Hoy, antes de dejarlo hacer cambios importantes, quiero el proyecto en un estado conocido de Git. Eso me da un diff legible y una vuelta atrás barata.</li>
+    <li><strong>pbip lint.</strong> Corre los validadores de Microsoft y los chequeos de coherencia. Si algo falla, el cambio vuelve al agente con el hallazgo, o se revierte.</li>
+    <li><strong>safe-copy.</strong> El reporte se publica primero como una copia con otro nombre (<code>ZZ-…</code>). Como la publicación busca los items por nombre, la copia se crea como un item nuevo y no pisa el real.</li>
+    <li><strong>Mirarlo.</strong> No existe un renderizador de Power BI para Linux: la única prueba de que un visual se ve bien es abrirlo. Recién después se publica el real.</li>
+  </ol>
+
+  <h2>Qué detecta cada herramienta</h2>
+  <p>
+    Armé un reporte sintético con defectos plantados a propósito y lo pasé por todas las capas. El objetivo no es mostrar que una herramienta "gana": <strong>herramientas distintas responden preguntas distintas.</strong>
+  </p>
+
+  <div class="my-6 overflow-x-auto rounded-2xl border border-slate-200 dark:border-white/10">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-slate-900 dark:bg-slate-800/60 dark:text-white">
+        <tr>
+          <th class="px-4 py-3 font-semibold">Defecto</th>
+          <th class="px-4 py-3 font-semibold">Validadores estructurales</th>
+          <th class="px-4 py-3 font-semibold">Chequeos de coherencia</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 text-slate-600 dark:divide-white/10 dark:text-slate-300">
+        {rows.map(([defect, structural, coherence]) => (
+          <tr>
+            <td class="px-4 py-3">{defect}</td>
+            <td class="px-4 py-3">{structural}</td>
+            <td class="px-4 py-3">{coherence}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    Las dos últimas filas son las que muestran que se complementan. El validador de PBIR marca el visual fuera del canvas; el parser de TMDL detecta cualquier error de sintaxis, mientras que mi chequeo solo reconoce un patrón puntual que ya me había roto un proyecto entero. Así se ve el hallazgo del ejemplo de arriba:
+  </p>
+
+  <pre class="my-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100"><code set:text={lint} /></pre>
+
+  <h2>No confié en la IA</h2>
+  <p>
+    Buena parte del código de pbip-guardrails lo escribió un agente, rápido. Eso deja una pregunta que cualquier ingeniero haría: <strong>¿cómo sé que no inventó una solución que solo parece funcionar?</strong> Por eso nada se aceptó por su cuenta: cada paso se contrastó con algo independiente.
+  </p>
+  <ProofChain lang="es" />
+
+  <ol class="case-timeline">
+    <li><strong>Un caso con respuestas conocidas.</strong> Un script genera un reporte sano y uno roto, con un defecto plantado por cada tipo de chequeo.</li>
+    <li><strong>Tests automáticos.</strong> El sano tiene que dar cero hallazgos; el roto, exactamente los que se plantaron.</li>
+    <li><strong>Las herramientas oficiales como referencia.</strong> El parser y el CLI de Microsoft corren sobre el mismo caso: el sano pasa, el TMDL roto falla donde tiene que fallar.</li>
+    <li><strong>Paridad con la versión anterior.</strong> Los chequeos nacieron como un script interno. La versión generalizada tuvo que dar exactamente los mismos hallazgos sobre varios proyectos PBIP reales, en modo solo lectura.</li>
+    <li><strong>Correcciones que salieron de mirar, no de suponer.</strong> El primer reporte "sano" que generó el agente tenía un error real de TMDL, y el propio linter lo marcó. Lo dejé como lección: el fixture también se valida.</li>
+  </ol>
+
+  <h2>Límites</h2>
+  <ul>
+    <li><strong>Pasar el linter no garantiza que el reporte se vea bien.</strong> Una consulta puede fallar bajo cierto filtro o faltar un permiso. Por eso existe la copia <code>ZZ-</code>.</li>
+    <li><strong>El nivel 3 sigue siendo humano.</strong> Ninguna herramienta sabe qué quiere decir "cliente activo" en tu negocio.</li>
+    <li><strong>Los chequeos son heurísticos y están calibrados para no hacer ruido.</strong> Cada regla descuenta los casos legítimos conocidos; si aparecen cientos de hallazgos, el problema es el umbral, no el reporte.</li>
+  </ul>
+
+  <h2>Qué aprendí</h2>
+  <div class="case-grid cols-3">
+    <div class="case-card">
+      <p class="case-card__label">El formato habilita todo</p>
+      <p>Diff, rollback, CI, linting y revisión existen porque PBIP convirtió un artefacto de interfaz en uno que un agente puede editar.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Velocidad pide controles</p>
+      <p>Si dejo que una IA toque mis reportes, necesito los mismos controles que ya damos por sentado cuando una IA toca código.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Nombrar el nivel</p>
+      <p>"¿Es válido?", "¿es coherente?" y "¿es correcto?" son preguntas distintas. Mezclarlas es lo que hace que un error pase.</p>
+    </div>
+  </div>
+
+  <h2>El código</h2>
+  <p>
+    pbip-guardrails es open source (MIT): trae los chequeos de coherencia, la integración con los validadores de Microsoft, la copia segura para publicar, un ejemplo sintético para probarlo y un ejemplo de CI.
+  </p>
+  <p>
+    <a class="inline-flex items-center rounded-full bg-[#0074A8] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004F8B]" href={REPO}>Ver pbip-guardrails en GitHub →</a>
+  </p>
+</CaseStudyLayout>

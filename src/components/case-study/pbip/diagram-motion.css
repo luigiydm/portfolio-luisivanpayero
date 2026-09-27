@@ -1,0 +1,99 @@
+/*
+ * Shared motion for the case-study diagrams.
+ *
+ * Contract: with no extra class, every diagram is in its FINAL state. That is what
+ * you get without JavaScript and with prefers-reduced-motion. Only when
+ * diagram-motion.ts adds `.is-armed` do elements start hidden, and `.is-playing`
+ * (added once, on entering the viewport) replays them into that same final state.
+ * Everything animates opacity / transform / color only: no layout shift.
+ *
+ * Per-element timing comes from the inline custom property --d (ms).
+ */
+
+.dg-rail-seg {
+  transform-origin: top;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* elements that appear */
+  .dg.is-armed .dg-in {
+    opacity: 0;
+  }
+  .dg.is-playing .dg-in {
+    animation: dg-in 380ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms) both;
+  }
+
+  /* connector segments that draw downwards */
+  .dg.is-armed .dg-rail-seg {
+    transform: scaleY(0);
+  }
+  .dg.is-playing .dg-rail-seg {
+    animation: dg-draw-y 240ms ease-out var(--d, 0ms) both;
+  }
+
+  /* rail dots light up in their own colour when the flow reaches them.
+     No armed rule on purpose: fill-mode "both" shows the grey `from` frame during
+     the delay, and the dot then keeps its own (final) colour. */
+  .dg.is-playing .dg-dot {
+    animation: dg-dot 320ms ease-out var(--d, 0ms) both;
+  }
+
+  /* the "before" column steps back once the new workflow starts */
+  .dg.is-playing .dg-recede {
+    animation: dg-recede 500ms ease-out var(--d, 0ms) both;
+  }
+
+  /* a state that only exists DURING the sequence (e.g. an example FAIL) */
+  .dg.is-playing .dg-transient {
+    animation: dg-transient var(--dur, 1000ms) ease-in-out var(--d, 0ms) both;
+  }
+
+  /* the example failure path: vivid while it happens, quieter in the final state */
+  .dg.is-armed .dg-branch {
+    opacity: 0;
+  }
+  .dg.is-playing .dg-branch {
+    animation: dg-branch 1300ms ease-out var(--d, 0ms) both;
+  }
+}
+
+@keyframes dg-in {
+  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes dg-draw-y {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes dg-dot {
+  from { background-color: rgb(203 213 225); transform: scale(0.6); }
+  60%  { transform: scale(1.35); }
+  to   { transform: scale(1); }
+}
+@keyframes dg-recede {
+  from { opacity: 1; }
+  to   { opacity: var(--recede-to, 0.72); }
+}
+@keyframes dg-transient {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes dg-branch {
+  0%   { opacity: 0; transform: translate3d(0, 6px, 0); }
+  20%  { opacity: 1; transform: none; }
+  70%  { opacity: 1; }
+  100% { opacity: var(--branch-to, 0.7); }
+}
+
+/* Final-state values for elements whose final look isn't fully opaque. */
+.dg-recede {
+  opacity: var(--recede-to, 0.72);
+}
+.dg-branch {
+  opacity: var(--branch-to, 0.7);
+}
+.dg-transient {
+  opacity: 0;
+}

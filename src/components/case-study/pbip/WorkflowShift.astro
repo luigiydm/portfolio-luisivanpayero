@@ -1,0 +1,105 @@
+---
+/**
+ * Before / now: the unit of work goes from a GUI to a versioned project.
+ * Animated once on scroll; the markup alone is the final state.
+ */
+import "./diagram-motion.css"
+
+interface Props {
+  lang?: "es" | "en"
+}
+const { lang = "es" } = Astro.props
+
+const T = {
+  es: {
+    label: "Diagrama: cómo cambió el flujo de trabajo",
+    before: "Antes",
+    beforeNote: "El reporte es un archivo que se edita con clics.",
+    beforeSteps: ["Idea", "Power BI Desktop", "Edición manual", "Archivo .pbix", "Publicar"],
+    now: "Ahora",
+    nowNote: "El reporte es un proyecto de archivos versionables que un agente modifica como código.",
+    nowSteps: [
+      ["Idea", false],
+      ["Agente de IA", true],
+      ["Archivos PBIP (texto)", true],
+      ["Diff en Git", true],
+      ["Validación", false],
+      ["Revisión", false],
+      ["Publicar", false],
+    ],
+  },
+  en: {
+    label: "Diagram: how the workflow changed",
+    before: "Before",
+    beforeNote: "The report is a file you edit by clicking.",
+    beforeSteps: ["Idea", "Power BI Desktop", "Manual editing", ".pbix file", "Publish"],
+    now: "Now",
+    nowNote: "The report becomes a project of versionable files that an agent can edit as code.",
+    nowSteps: [
+      ["Idea", false],
+      ["AI agent", true],
+      ["PBIP files (plain text)", true],
+      ["Git diff", true],
+      ["Validation", false],
+      ["Review", false],
+      ["Publish", false],
+    ],
+  },
+}[lang] as {
+  label: string; before: string; beforeNote: string; beforeSteps: string[]
+  now: string; nowNote: string; nowSteps: [string, boolean][]
+}
+
+const STEP = 220 // ms between steps of the new workflow
+const NOW_START = 900
+const nowDelay = (i: number) => NOW_START + i * STEP
+---
+
+<figure class="dg my-8 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5 sm:p-7 dark:border-white/10 dark:bg-slate-950/40" data-diagram aria-label={T.label}>
+  <div class="grid gap-7 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-10">
+    <!-- BEFORE: compact, steps back once the new flow starts -->
+    <div class="dg-recede" style="--d:700ms">
+      <div class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{T.before}</div>
+      <ol class="m-0 mt-3 flex list-none flex-wrap items-center gap-x-1.5 gap-y-2 p-0 md:flex-col md:items-stretch md:gap-0">
+        {T.beforeSteps.map((step, i) => (
+          <li class="dg-in flex items-center gap-1.5 md:flex-col md:items-stretch md:gap-0" style={`--d:${i * 80}ms`}>
+            {i > 0 && <span class="hidden h-3 w-px self-center bg-slate-300 md:block dark:bg-white/15" aria-hidden="true"></span>}
+            <span class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-center text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-slate-900 dark:text-slate-300">{step}</span>
+            {i < T.beforeSteps.length - 1 && <span class="text-slate-400 md:hidden" aria-hidden="true">→</span>}
+          </li>
+        ))}
+      </ol>
+      <div class="dg-in mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400" style="--d:500ms">{T.beforeNote}</div>
+    </div>
+
+    <!-- NOW: built step by step on a rail -->
+    <div>
+      <div class="dg-in text-xs font-bold uppercase tracking-[0.18em] text-[#0074A8] dark:text-sky-300" style={`--d:${NOW_START - 120}ms`}>{T.now}</div>
+      <ol class="m-0 mt-3 list-none p-0">
+        {T.nowSteps.map(([step, key], i) => (
+          <li class="relative pb-2.5 pl-8 last:pb-0">
+            {i < T.nowSteps.length - 1 && (
+              <span class="dg-rail-seg absolute bottom-[-16px] left-[9px] top-[26px] w-0.5 bg-slate-300 dark:bg-white/15" style={`--d:${nowDelay(i) + 120}ms`} aria-hidden="true"></span>
+            )}
+            <span class:list={["dg-dot absolute left-[4px] top-[15px] size-3 rounded-full ring-4 ring-slate-50 dark:ring-slate-950", key ? "bg-sky-500" : "bg-slate-400 dark:bg-slate-500"]} style={`--d:${nowDelay(i)}ms`} aria-hidden="true"></span>
+            <div
+              class:list={[
+                "dg-in rounded-xl border px-4 py-2.5 text-[15px] font-semibold",
+                key
+                  ? "border-sky-400 bg-sky-50 text-[#004F8B] dark:border-sky-400/50 dark:bg-sky-400/10 dark:text-sky-200"
+                  : "border-slate-200 bg-white text-slate-800 dark:border-white/10 dark:bg-slate-900 dark:text-slate-100",
+              ]}
+              style={`--d:${nowDelay(i)}ms`}
+            >{step}</div>
+          </li>
+        ))}
+      </ol>
+      <div class="dg-in mt-4 rounded-xl border-l-4 border-sky-500 bg-white px-4 py-3 text-[15px] font-semibold leading-6 text-slate-900 dark:bg-slate-900 dark:text-white" style={`--d:${nowDelay(T.nowSteps.length) + 150}ms`}>{T.nowNote}</div>
+    </div>
+  </div>
+</figure>
+
+<script>
+  import { initDiagrams } from "./diagram-motion"
+  initDiagrams()
+</script>

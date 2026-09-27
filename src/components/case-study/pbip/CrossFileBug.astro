@@ -1,0 +1,95 @@
+---
+/**
+ * Two valid files whose combination is wrong: a cross-file coherence defect.
+ * Mirrors examples/broken in the pbip-guardrails repo.
+ */
+import "./diagram-motion.css"
+
+interface Props {
+  lang?: "es" | "en"
+}
+const { lang = "es" } = Astro.props
+
+const T = {
+  es: {
+    label: "Diagrama: un defecto que vive entre dos archivos válidos",
+    report: { path: "Sales.Report / visual.json", kind: "PBIR · el visual", code: "Stages[Order] IN (2, 3)" },
+    model: { path: "Sales.SemanticModel / Deals.tmdl", kind: "TMDL · la medida", code: "MAX ( Stages[Order] )" },
+    valid: "válido por sí solo",
+    steps: [
+      "El filtro del visual admite las etapas 2 y 3",
+      "La medida usa MAX(Stages[Order])",
+      "Termina resolviendo solo la etapa 3",
+    ],
+    warn: "El valor mostrado puede no representar el contexto que el visual aparenta tener",
+    caption: "Cada archivo es válido por separado. El defecto aparece al combinarlos: es un problema de coherencia entre archivos.",
+  },
+  en: {
+    label: "Diagram: a defect that lives between two valid files",
+    report: { path: "Sales.Report / visual.json", kind: "PBIR · the visual", code: "Stages[Order] IN (2, 3)" },
+    model: { path: "Sales.SemanticModel / Deals.tmdl", kind: "TMDL · the measure", code: "MAX ( Stages[Order] )" },
+    valid: "valid on its own",
+    steps: [
+      "The visual's filter admits stages 2 and 3",
+      "The measure uses MAX(Stages[Order])",
+      "It ends up resolving stage 3 only",
+    ],
+    warn: "The value shown may not represent the context the visual appears to have",
+    caption: "Each file is valid on its own. The defect appears when you combine them: a cross-file coherence problem.",
+  },
+}[lang]
+
+const files = [T.report, T.model]
+const STEPS_START = 1350
+const stepDelay = (i: number) => STEPS_START + i * 260
+const WARN = stepDelay(T.steps.length) + 60
+---
+
+<figure class="dg my-8 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5 sm:p-7 dark:border-white/10 dark:bg-slate-950/40" data-diagram aria-label={T.label}>
+  <!-- the two files, each valid on its own -->
+  <div class="grid gap-3 md:grid-cols-2 md:gap-5">
+    {files.map((f, i) => (
+      <div class="dg-in rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-slate-900" style={`--d:${i * 150}ms`}>
+        <div class="break-words font-mono text-xs text-slate-500 dark:text-slate-400">{f.path}</div>
+        <div class="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-[#0074A8] dark:text-sky-300">{f.kind}</div>
+        <code class="mt-3 block overflow-x-auto whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 font-mono text-[13px] text-slate-100">{f.code}</code>
+        <div class="dg-in mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300" style={`--d:${550 + i * 150}ms`}>
+          <span aria-hidden="true">✓</span>{T.valid}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- the two files meet: converging lines on desktop, one line on mobile -->
+  <svg class="dg-in hidden h-10 w-full text-slate-400 md:block dark:text-slate-500" style="--d:950ms" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M25 0 C25 22 50 18 50 40" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
+    <path d="M75 0 C75 22 50 18 50 40" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
+  </svg>
+  <div class="flex justify-center md:hidden" aria-hidden="true">
+    <span class="dg-rail-seg block h-8 w-0.5 bg-slate-300 dark:bg-white/15" style="--d:950ms"></span>
+  </div>
+
+  <!-- what happens when they are combined -->
+  <ol class="mx-auto m-0 max-w-xl list-none p-0">
+    {T.steps.map((step, i) => (
+      <li class="relative pb-2.5 pl-8">
+        <span class="dg-rail-seg absolute bottom-[-16px] left-[9px] top-[26px] w-0.5 bg-slate-300 dark:bg-white/15" style={`--d:${stepDelay(i) + 120}ms`} aria-hidden="true"></span>
+        <span class="dg-dot absolute left-[4px] top-[15px] size-3 rounded-full bg-slate-400 ring-4 ring-slate-50 dark:bg-slate-500 dark:ring-slate-950" style={`--d:${stepDelay(i)}ms`} aria-hidden="true"></span>
+        <div class="dg-in rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-[15px] font-semibold text-slate-800 dark:border-white/10 dark:bg-slate-900 dark:text-slate-100" style={`--d:${stepDelay(i)}ms`}>{step}</div>
+      </li>
+    ))}
+    <li class="relative pl-8">
+      <span class="dg-dot absolute left-[4px] top-[17px] size-3 rounded-full bg-amber-500 ring-4 ring-slate-50 dark:ring-slate-950" style={`--d:${WARN}ms`} aria-hidden="true"></span>
+      <div class="dg-in flex gap-2 rounded-xl border-2 border-amber-500 bg-amber-50 px-4 py-2.5 text-[15px] font-semibold leading-6 text-amber-900 dark:border-amber-400/70 dark:bg-amber-400/10 dark:text-amber-100" style={`--d:${WARN}ms`}>
+        <span aria-hidden="true">⚠</span><span>{T.warn}</span>
+      </div>
+    </li>
+  </ol>
+
+  <figcaption class="dg-in mx-auto mt-5 max-w-xl text-center text-[15px] font-semibold leading-6 text-slate-900 dark:text-white" style={`--d:${WARN + 380}ms`}>{T.caption}</figcaption>
+</figure>
+
+<script>
+  import { initDiagrams } from "./diagram-motion"
+  initDiagrams()
+</script>

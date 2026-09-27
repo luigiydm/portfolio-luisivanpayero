@@ -1,0 +1,186 @@
+---
+/**
+ * The main diagram: an AI change travelling through the guardrails.
+ *
+ * The sequence is ILLUSTRATIVE (one change that fails coherence once, gets fixed and
+ * passes); the final state, which is also what you see without JS or with reduced
+ * motion, is the complete path passing with the failure branch still visible.
+ * Dashed amber = decided by a person; solid = done by a tool.
+ */
+import "./diagram-motion.css"
+
+interface Props {
+  lang?: "es" | "en"
+}
+const { lang = "es" } = Astro.props
+
+type Kind = "human" | "tool" | "key"
+const T = {
+  es: {
+    label: "Diagrama: el recorrido de un cambio hecho por un agente de IA a través de los controles",
+    before: [
+      ["Pedido en lenguaje natural", "human"],
+      ["Agente de IA", "key"],
+      ["Edita los archivos PBIP", "tool"],
+      ["Revisar el diff en Git", "human"],
+      ["pbip lint", "key"],
+    ],
+    l1: { tag: "Nivel 1 · Válido", title: "TMDL + PBIR", sub: "validadores de Microsoft" },
+    l2: { tag: "Nivel 2 · Coherente", title: "visual ↔ medida", sub: "pbip-guardrails" },
+    pass: "pasa",
+    fail: "falla",
+    branch: { tag: "Camino de falla · ejemplo", body: "Inspeccionar el diff · corregir · revertir", back: "↺ vuelve al agente" },
+    after: [
+      ["safe-copy → reporte ZZ-", "tool"],
+      ["Publicar la copia en Power BI Service", "tool"],
+      ["Refresh y revisión visual", "human"],
+      ["Publicar el reporte real", "human"],
+    ],
+    legendTool: "lo hace una herramienta",
+    legendHuman: "lo decide una persona",
+    tagline: ["Prompt", "Artefacto", "Evidencia", "Liberación controlada por una persona"],
+    not: "No es prompt → producción.",
+  },
+  en: {
+    label: "Diagram: a change made by an AI agent travelling through the guardrails",
+    before: [
+      ["Natural-language request", "human"],
+      ["AI agent", "key"],
+      ["Edits the PBIP files", "tool"],
+      ["Review the Git diff", "human"],
+      ["pbip lint", "key"],
+    ],
+    l1: { tag: "Level 1 · Valid", title: "TMDL + PBIR", sub: "Microsoft validators" },
+    l2: { tag: "Level 2 · Coherent", title: "visual ↔ measure", sub: "pbip-guardrails" },
+    pass: "pass",
+    fail: "fail",
+    branch: { tag: "Failure path · example", body: "Inspect the diff · fix · roll back", back: "↺ back to the agent" },
+    after: [
+      ["safe-copy → ZZ- report", "tool"],
+      ["Publish the copy to Power BI Service", "tool"],
+      ["Refresh and visual review", "human"],
+      ["Publish the real report", "human"],
+    ],
+    legendTool: "done by a tool",
+    legendHuman: "decided by a person",
+    tagline: ["Prompt", "Artifact", "Evidence", "Human-controlled release"],
+    not: "Not prompt → production.",
+  },
+}[lang] as {
+  label: string; before: [string, Kind][]; after: [string, Kind][]
+  l1: { tag: string; title: string; sub: string }; l2: { tag: string; title: string; sub: string }
+  pass: string; fail: string; branch: { tag: string; body: string; back: string }
+  legendTool: string; legendHuman: string; tagline: string[]; not: string
+}
+
+// Timeline (ms). Whole sequence ≈ 4.4 s; the final state is what matters.
+const beforeDelay = (i: number) => i * 250          // 0 … 1000
+const L1 = 1250, L1_PASS = 1420
+const L2 = 1550, L2_FAIL = 1680, FAIL_FOR = 1000   // example failure window
+const BRANCH = 1850
+const L2_PASS = L2_FAIL + FAIL_FOR
+const afterDelay = (i: number) => L2_PASS + 200 + i * 250   // 2880 … 3630
+const TAGLINE = afterDelay(T.after.length) + 60
+
+const card: Record<Kind, string> = {
+  tool: "border-slate-200 bg-white text-slate-800 dark:border-white/10 dark:bg-slate-900 dark:text-slate-100",
+  key: "border-sky-400 bg-sky-50 text-[#004F8B] dark:border-sky-400/50 dark:bg-sky-400/10 dark:text-sky-200",
+  human: "border-dashed border-amber-500 bg-amber-50 text-amber-900 dark:border-amber-400/70 dark:bg-amber-400/10 dark:text-amber-100",
+}
+const dot: Record<Kind, string> = {
+  tool: "bg-slate-400 dark:bg-slate-500",
+  key: "bg-sky-500",
+  human: "bg-amber-500",
+}
+const seg = "dg-rail-seg absolute bottom-[-16px] left-[9px] top-[26px] w-0.5 bg-slate-300 dark:bg-white/15"
+const dotBase = "dg-dot absolute left-[4px] top-[15px] size-3 rounded-full ring-4 ring-slate-50 dark:ring-slate-950"
+const nodeBase = "dg-in rounded-xl border-2 px-4 py-2.5 text-[15px] font-semibold"
+---
+
+<figure class="dg my-8 rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5 sm:p-7 dark:border-white/10 dark:bg-slate-950/40" data-diagram aria-label={T.label}>
+  <ol class="m-0 list-none p-0 md:max-w-[46rem]">
+    {T.before.map(([text, kind], i) => (
+      <li class="relative pb-2.5 pl-8">
+        <span class={seg} style={`--d:${beforeDelay(i) + 120}ms`} aria-hidden="true"></span>
+        <span class:list={[dotBase, dot[kind]]} style={`--d:${beforeDelay(i)}ms`} aria-hidden="true"></span>
+        <div class:list={[nodeBase, card[kind], "md:max-w-[22rem]"]} style={`--d:${beforeDelay(i)}ms`}>
+          {text === "pbip lint" ? <code class="font-mono">pbip lint</code> : text}
+        </div>
+      </li>
+    ))}
+
+    <!-- Level 1: valid -->
+    <li class="relative pb-2.5 pl-8">
+      <span class={seg} style={`--d:${L1 + 120}ms`} aria-hidden="true"></span>
+      <span class:list={[dotBase, "bg-emerald-500"]} style={`--d:${L1_PASS}ms`} aria-hidden="true"></span>
+      <div class="dg-in flex flex-col items-start gap-2 rounded-xl border-2 border-emerald-500/70 sm:flex-row sm:items-center sm:justify-between sm:gap-3 bg-white px-4 py-2.5 md:max-w-[22rem] dark:border-emerald-400/50 dark:bg-slate-900" style={`--d:${L1}ms`}>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{T.l1.tag}</div>
+          <div class="text-[15px] font-semibold text-slate-900 dark:text-white">{T.l1.title}</div>
+          <div class="text-xs text-slate-500 dark:text-slate-400">{T.l1.sub}</div>
+        </div>
+        <span class="dg-in shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300" style={`--d:${L1_PASS}ms`}>✓ {T.pass}</span>
+      </div>
+    </li>
+
+    <!-- Level 2: coherent, with the example failure path next to it -->
+    <li class="relative pb-2.5 pl-8">
+      <span class={seg} style={`--d:${L2_PASS + 100}ms`} aria-hidden="true"></span>
+      <span class:list={[dotBase, "bg-emerald-500"]} style={`--d:${L2_PASS}ms`} aria-hidden="true"></span>
+      <div class="flex flex-col gap-2.5 md:flex-row md:items-center md:gap-0">
+        <div class="dg-in relative flex flex-col items-start gap-2 rounded-xl border-2 border-emerald-500/70 sm:flex-row sm:items-center sm:justify-between sm:gap-3 bg-white px-4 py-2.5 md:w-[22rem] md:shrink-0 dark:border-emerald-400/50 dark:bg-slate-900" style={`--d:${L2}ms`}>
+          <!-- red outline only while the example failure happens -->
+          <span class="dg-transient pointer-events-none absolute -inset-[2px] rounded-xl border-2 border-red-500" style={`--d:${L2_FAIL}ms; --dur:${FAIL_FOR}ms`} aria-hidden="true"></span>
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-[#0074A8] dark:text-sky-300">{T.l2.tag}</div>
+            <div class="text-[15px] font-semibold text-slate-900 dark:text-white">{T.l2.title}</div>
+            <div class="font-mono text-xs text-slate-500 dark:text-slate-400">{T.l2.sub}</div>
+          </div>
+          <span class="relative shrink-0">
+            <span class="dg-in inline-block rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300" style={`--d:${L2_PASS}ms`}>✓ {T.pass}</span>
+            <span class="dg-transient absolute inset-0 inline-flex items-center justify-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 dark:bg-red-500/15 dark:text-red-300" style={`--d:${L2_FAIL}ms; --dur:${FAIL_FOR}ms`} aria-hidden="true">✗ {T.fail}</span>
+          </span>
+        </div>
+
+        <!-- connector to the branch: horizontal on desktop, a short hook on mobile -->
+        <div class="dg-branch hidden w-12 shrink-0 items-center px-1 text-red-400 md:flex" style={`--d:${BRANCH - 120}ms`} aria-hidden="true">
+          <span class="h-0.5 flex-1 bg-current"></span>
+          <span class="-ml-px size-0 border-y-[5px] border-l-[7px] border-y-transparent border-l-current"></span>
+        </div>
+        <div class="dg-branch ml-4 border-l-2 border-red-400 pl-3 md:ml-0 md:flex-1 md:border-l-0 md:pl-0" style={`--d:${BRANCH}ms`}>
+          <div class="rounded-xl border-2 border-red-400 bg-red-50 px-4 py-2.5 text-red-900 dark:border-red-400/60 dark:bg-red-500/10 dark:text-red-100">
+            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-red-600 dark:text-red-300">{T.branch.tag}</div>
+            <div class="text-[15px] font-semibold">{T.branch.body}</div>
+            <div class="text-xs font-semibold text-red-700 dark:text-red-300">{T.branch.back}</div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    {T.after.map(([text, kind], i) => (
+      <li class="relative pb-2.5 pl-8 last:pb-0">
+        {i < T.after.length - 1 && <span class={seg} style={`--d:${afterDelay(i) + 120}ms`} aria-hidden="true"></span>}
+        <span class:list={[dotBase, dot[kind]]} style={`--d:${afterDelay(i)}ms`} aria-hidden="true"></span>
+        <div class:list={[nodeBase, card[kind], "md:max-w-[22rem]"]} style={`--d:${afterDelay(i)}ms`}>{text}</div>
+      </li>
+    ))}
+  </ol>
+
+  <div class="dg-in mt-6 border-t border-slate-200 pt-5 dark:border-white/10" style={`--d:${TAGLINE}ms`}>
+    <div class="text-sm text-slate-500 dark:text-slate-400">{T.not}</div>
+    <ol class="m-0 mt-2 flex list-none flex-wrap items-center gap-x-2 gap-y-1 p-0 text-[15px] font-bold text-slate-900 dark:text-white">
+      {T.tagline.map((word, i) => (
+        <li class="flex items-center gap-2">{word}{i < T.tagline.length - 1 && <span class="text-sky-500" aria-hidden="true">→</span>}</li>
+      ))}
+    </ol>
+    <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600 dark:text-slate-300">
+      <span class="inline-flex items-center gap-2"><span class="inline-block h-4 w-6 rounded border-2 border-slate-300 bg-white dark:border-white/20 dark:bg-slate-900" aria-hidden="true"></span>{T.legendTool}</span>
+      <span class="inline-flex items-center gap-2"><span class="inline-block h-4 w-6 rounded border-2 border-dashed border-amber-500 bg-amber-50 dark:bg-amber-400/10" aria-hidden="true"></span>{T.legendHuman}</span>
+    </div>
+  </div>
+</figure>
+
+<script>
+  import { initDiagrams } from "./diagram-motion"
+  initDiagrams()
+</script>

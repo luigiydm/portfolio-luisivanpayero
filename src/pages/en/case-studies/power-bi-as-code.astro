@@ -1,0 +1,192 @@
+---
+import CaseStudyLayout from "@/layouts/CaseStudyLayout.astro"
+import WorkflowShift from "@/components/case-study/pbip/WorkflowShift.astro"
+import CrossFileBug from "@/components/case-study/pbip/CrossFileBug.astro"
+import LevelsStrip from "@/components/case-study/pbip/LevelsStrip.astro"
+import GuardrailPipeline from "@/components/case-study/pbip/GuardrailPipeline.astro"
+import ProofChain from "@/components/case-study/pbip/ProofChain.astro"
+
+const REPO = "https://github.com/luigiydm/pbip-guardrails"
+
+const diff = `  "filter": { "In": {
+    "Expressions": [ Stages[Order] ],
+-   "Values": [ [ 3 ] ]
++   "Values": [ [ 2 ], [ 3 ] ]
+  } }`
+
+const dax = `Deals at stage =
+    VAR _order = MAX ( Stages[Order] )
+    RETURN
+        CALCULATE ( COUNTROWS ( Deals ), Stages[Order] = _order )`
+
+const lint = `$ pbip lint examples/broken --family 'Segment (\\d+)'
+  'Pipeline' [filters] cardVisual b0000000000000000001: Order IN ['2L', '3L']
+      -> ['Deals at stage'] depend(s) on the row's Order: the value shown may not match the filter`
+
+const rows = [
+  ["A measure that no longer exists", "—", "✓"],
+  ["Multi-value filter + a measure using MAX", "—", "✓"],
+  ["A visual crossing metrics of two populations", "—", "✓"],
+  ["A duplicate visual hidden under another", "—", "✓"],
+  ["A visual outside the canvas", "✓ (warning)", "✓"],
+  ["TMDL that can't be parsed", "✓ (any error)", "one known pattern only"],
+]
+---
+
+<CaseStudyLayout
+  title="What happened when I started treating Power BI reports like code"
+  eyebrow="Case Study 05"
+  date="2026"
+  readTime="8 min read"
+  description="How PBIP, Git and a small validation toolkit let me use AI agents to change reports quickly, without losing the diff, the validation or the way back."
+  tags={["Power BI", "PBIP", "AI agents", "Git", "CI/CD", "Python"]}
+  lang="en"
+  alternatePath="/case-studies/power-bi-as-code/"
+>
+  <h2>Summary</h2>
+  <p>
+    I started building Power BI reports with AI agents working directly on the project files. It made me much faster. It also forced me to answer a question I didn't have before:
+  </p>
+  <p class="case-note">
+    <strong>How much autonomy can I give an AI agent before I need stronger engineering controls?</strong>
+  </p>
+  <p>
+    This case is about how my way of working changed: what development gained by going through the agent, what new kind of risk showed up, and which controls I had to add as the agent made bigger changes.
+  </p>
+
+  <h2>The shift: from a GUI to a project</h2>
+  <p>
+    For years a Power BI report was a <code>.pbix</code> file: a binary edited by clicking in Power BI Desktop. With the project format (PBIP), the model becomes <strong>TMDL</strong> and the report becomes <strong>PBIR</strong>: folders of plain-text files you can read, diff and version.
+  </p>
+  <p>
+    That changed more than the format. An AI agent that works with files can now add a visual, change a filter, reorganize a page or refactor measures. The unit of work stopped being a GUI and became a project.
+  </p>
+
+  <WorkflowShift lang="en" />
+
+  <p>
+    There are tools that give an agent ways to interact with Power BI, and they're useful. For the way I work, something else mattered more: a versioned artifact the agent edits like code. The two ideas complement each other.
+  </p>
+
+  <h2>The problem: faster at everything, including breaking things</h2>
+  <p>
+    If an agent can change a whole report in seconds, it can break it in seconds too. And the dangerous mistakes aren't the ones that stop the project from opening: they're the ones that leave a number that looks fine and is wrong.
+  </p>
+  <p>A concrete example. The agent changes a card's filter so it covers two funnel stages:</p>
+
+  <pre class="my-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100"><code set:text={diff} /></pre>
+
+  <p>And the measure that card shows, in another folder of the project, resolves the row with <code>MAX</code>:</p>
+
+  <pre class="my-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100"><code set:text={dax} /></pre>
+
+  <CrossFileBug lang="en" />
+
+  <p>
+    Each piece is valid on its own. Together, the filter admits stages 2 and 3, but the measure uses <code>MAX</code> and ends up resolving stage 3 only: the value shown may not represent the context the visual appears to have. Nothing is malformed, so no structural validator has any reason to flag it.
+  </p>
+  <p>
+    This isn't a lab case. In a real report, a visual produced an impossible conversion rate above 100%. The underlying measure was valid; the problem was the filter context passed by the visual. The example above is its synthetic equivalent, and anyone can reproduce it from the repo.
+  </p>
+  <p>
+    The filter lives in the report and the measure in the model. <strong>Nothing was checking the relationship between the two.</strong>
+  </p>
+
+  <h2>Valid is not the same as correct</h2>
+  <p>
+    What sorted it out for me was separating three different questions, which need three different kinds of check. The first one already had tools. For the second I couldn't find any, and that's where <a class="font-semibold text-sky-700 underline dark:text-sky-300" href={REPO}>pbip-guardrails</a> ended up coming from.
+  </p>
+
+  <LevelsStrip lang="en" />
+
+  <h2>The guardrails around the agent</h2>
+  <p>
+    With that clear, the workflow ended up like this. It's not an end-to-end automated pipeline: some steps are done by a tool and others are decided by a person, and the diagram tells them apart.
+  </p>
+
+  <GuardrailPipeline lang="en" />
+
+  <ol class="case-timeline">
+    <li><strong>A known Git state.</strong> I didn't start with this process: it emerged as the agent made bigger changes. Now, before letting an agent make substantial changes, I want the project in a known Git state. That gives me a readable diff and a cheap rollback path.</li>
+    <li><strong>pbip lint.</strong> Runs Microsoft's validators and the coherence checks. If something fails, the change goes back to the agent with the finding, or gets rolled back.</li>
+    <li><strong>safe-copy.</strong> The report is first published as a copy under another name (<code>ZZ-…</code>). Since publishing matches items by name, the copy is created as a new item and never overwrites the real one.</li>
+    <li><strong>Look at it.</strong> There's no Power BI renderer for Linux: the only proof a visual looks right is opening it. Only then is the real one published.</li>
+  </ol>
+
+  <h2>What each tool catches</h2>
+  <p>
+    I built a synthetic report with defects planted on purpose and ran it through every layer. The point isn't to show that one tool "wins": <strong>different tools answer different questions.</strong>
+  </p>
+
+  <div class="my-6 overflow-x-auto rounded-2xl border border-slate-200 dark:border-white/10">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-slate-900 dark:bg-slate-800/60 dark:text-white">
+        <tr>
+          <th class="px-4 py-3 font-semibold">Defect</th>
+          <th class="px-4 py-3 font-semibold">Structural validators</th>
+          <th class="px-4 py-3 font-semibold">Coherence checks</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 text-slate-600 dark:divide-white/10 dark:text-slate-300">
+        {rows.map(([defect, structural, coherence]) => (
+          <tr>
+            <td class="px-4 py-3">{defect}</td>
+            <td class="px-4 py-3">{structural}</td>
+            <td class="px-4 py-3">{coherence}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    The last two rows show how they complement each other. The PBIR validator flags the visual outside the canvas; the TMDL parser catches any syntax error, while my check only recognizes one specific pattern that had once broken a whole project. This is what the finding from the example above looks like:
+  </p>
+
+  <pre class="my-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100"><code set:text={lint} /></pre>
+
+  <h2>I didn't trust the AI</h2>
+  <p>
+    An agent wrote a good part of pbip-guardrails's code, quickly. That leaves the question any engineer would ask: <strong>how do I know it didn't invent a solution that only looks like it works?</strong> That's why nothing was accepted on its own: every step was checked against something independent.
+  </p>
+  <ProofChain lang="en" />
+
+  <ol class="case-timeline">
+    <li><strong>A case with known answers.</strong> A script generates a healthy report and a broken one, with a defect planted for every kind of check.</li>
+    <li><strong>Automated tests.</strong> The healthy one must give zero findings; the broken one, exactly the ones planted.</li>
+    <li><strong>The official tools as a reference.</strong> Microsoft's parser and CLI run on the same case: the healthy one passes, the broken TMDL fails where it should.</li>
+    <li><strong>Parity with the previous version.</strong> The checks started as an internal script. The generalized version had to return exactly the same findings on several real PBIP projects, read-only.</li>
+    <li><strong>Fixes that came from looking, not assuming.</strong> The first "healthy" report the agent generated had a real TMDL error, and the linter itself caught it. I kept that as a lesson: the fixture gets validated too.</li>
+  </ol>
+
+  <h2>Limits</h2>
+  <ul>
+    <li><strong>Passing the linter doesn't guarantee the report renders.</strong> A query can fail under some filter, or a permission can be missing. That's why the <code>ZZ-</code> copy exists.</li>
+    <li><strong>Level 3 is still human.</strong> No tool knows what "active customer" means in your business.</li>
+    <li><strong>The checks are heuristic and tuned not to be noisy.</strong> Each rule discounts the known legitimate cases; if you get hundreds of findings, the threshold is wrong, not the report.</li>
+  </ul>
+
+  <h2>What I learned</h2>
+  <div class="case-grid cols-3">
+    <div class="case-card">
+      <p class="case-card__label">The format enables everything</p>
+      <p>Diff, rollback, CI, linting and review exist because PBIP turned a GUI artifact into one an agent can edit.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Speed calls for controls</p>
+      <p>If I let an AI touch my reports, I need the same controls we already take for granted when an AI touches code.</p>
+    </div>
+    <div class="case-card">
+      <p class="case-card__label">Name the level</p>
+      <p>"Is it valid?", "is it coherent?" and "is it correct?" are different questions. Mixing them up is how a mistake gets through.</p>
+    </div>
+  </div>
+
+  <h2>The code</h2>
+  <p>
+    pbip-guardrails is open source (MIT): the coherence checks, the integration with Microsoft's validators, the safe copy for publishing, a synthetic sample to try it on, and a CI example.
+  </p>
+  <p>
+    <a class="inline-flex items-center rounded-full bg-[#0074A8] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#004F8B]" href={REPO}>View pbip-guardrails on GitHub →</a>
+  </p>
+</CaseStudyLayout>
